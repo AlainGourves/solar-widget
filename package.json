@@ -1,0 +1,11 @@
+{
+  "name": "sun-position",
+  "version": "1.0.0",
+  "description": "Display the sun position in the sky according to time and place.",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "AlainGourves",
+  "license": "ISC"
+}
