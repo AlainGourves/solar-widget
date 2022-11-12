@@ -187,12 +187,12 @@ class Sun {
             this.ctxSun.beginPath();
             this.ctxSun.rect((this.canvasWidth - this.sineWidth)/-2, 0, this.canvasWidth, this.amplitude + this.sunRadius);
             this.ctxSun.clip();
-            this.ctxSun.strokeStyle = this.fillStyleSunHidden;
-            this.ctxSun.lineWidth = 2;
+            this.ctxSun.fillStyle = this.fillStyleSunHidden;
+            this.ctxSun.shadowColor = this.fillStyleSunHidden;
             this.ctxSun.shadowBlur = 0;
             this.ctxSun.beginPath();
             this.ctxSun.arc(this.sunX, this.sunY, this.sunRadius, 0, Math.PI * 2);
-            this.ctxSun.stroke();
+            this.ctxSun.fill();
             this.ctxSun.restore();
         }
     }

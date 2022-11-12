@@ -34,9 +34,7 @@ const getWeather = async function () {
         const savedTime = parseInt(localStorage.getItem('currentTime'));
         if ((t - savedTime) / 1000 < 60 * 5) {
             // Saved data is less than 5 minutes old
-            const data = JSON.parse(savedWeather);
-            data.dt = Math.floor(t/1000); // update current time
-            return data;
+            return JSON.parse(savedWeather);
         }
     }
 
@@ -88,7 +86,6 @@ const update = function (d) {
     updateTime(d);
     const seconds = d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds();
     starfield.angle = seconds;
-    cursor.value = seconds;
     sun.theTime = d.getTime()/1000; // timestamp in seconds
     draw();
 }
@@ -107,9 +104,10 @@ window.addEventListener('load', ev => {
             sun = new Sun(canvasWidth, canvasHeight);
             sun.sunriseTime = data.sunrise;
             sun.sunsetTime = data.sunset;
+            sun.theTime = data.dt;
             sunPathImage = sun.thePath;
-            update(new Date(data.dt * 1000));
-
+            updateTime(new Date(data.dt * 1000));
+            
             draw();
         });
 
@@ -120,7 +118,11 @@ window.addEventListener('load', ev => {
         update(d);
     });
 
-    btn.addEventListener("click", ev => {
-        update(new Date());
+    btn.addEventListener("click", (ev) => {
+        const d = new Date();
+        console.log(d.getTime())
+        const seconds = d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds();
+        cursor.value = seconds;
+        update(d);
     });
 });

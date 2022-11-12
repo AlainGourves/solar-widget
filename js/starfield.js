@@ -3,7 +3,7 @@ class Starfield {
     constructor(w, h) {
         this.canvasWidth = Math.ceil(Math.sqrt(w * w + h * h));
         this.canvasHeight = this.canvasWidth;
-        this.nbStars = 2000;
+        this.nbStars = 3000;
         this.stars = [];
         this.ctx;
 
@@ -17,9 +17,11 @@ class Starfield {
     }
 
     init() {
+        let tmpStars = [];
         for (let i = 0; i < this.nbStars; i++) {
-            this.stars.push(this.addStar());
+            tmpStars.push(this.addStar());
         }
+        this.stars = tmpStars.filter(star => star.r > 0.2);
         this.canvas = document.createElement('canvas', { 'willReadFrequently': true });
         this.ctx = this.canvas.getContext('2d');
         this.canvas.width = this.canvasWidth;
@@ -36,17 +38,17 @@ class Starfield {
         tmpCanvas.width = this.canvasWidth;
         tmpCanvas.height = this.canvasHeight;
 
-        const w = this.canvasWidth / 2;
-        const h = this.canvasHeight / 2;
+        const x = this.canvasWidth / 2;
+        const y = this.canvasHeight / 2;
 
         tmpCtx.save()
-        tmpCtx.translate(w, h);
+        tmpCtx.translate(x, y);
         tmpCtx.rotate(this._angle);
-        tmpCtx.translate(-w, -h);
+        tmpCtx.translate(-x, -y);
         tmpCtx.drawImage(this.canvas, 0, 0, this.canvasWidth, this.canvasHeight);
         tmpCtx.restore();
 
-        const imageData = tmpCtx.getImageData((this.canvasWidth - this.resultWidth) / 2, (this.canvasHeight - this.resultHeight) / 2, this.resultWidth, this.resultHeight);
+        const imageData = tmpCtx.getImageData((this.canvasWidth - this.resultWidth) / 2, ((this.canvasHeight - this.resultHeight) / 2) + 20, this.resultWidth, this.resultHeight);
 
         tmpCanvas.width = this.resultWidth;
         tmpCanvas.height = this.resultHeight;
@@ -67,16 +69,16 @@ class Starfield {
         this.ctx.fillStyle = '#fff';
         this.ctx.shadowColor = '#fff';
         this.ctx.shadowBlur = 4;
-        for (let i = 0; i < this.nbStars; i++) {
+        this.stars.forEach(star => {
             this.ctx.beginPath();
             this.ctx.globalAlpha = Math.random();
-            this.ctx.arc(this.stars[i].x, this.stars[i].y, this.stars[i].r, 0, Math.PI * 2);
+            this.ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
             this.ctx.fill();
-        }
+        });
         // Pole Star
         this.ctx.globalAlpha = 0.95;
         this.ctx.beginPath();
-        this.ctx.arc(this.canvasWidth/2, this.canvasHeight/2, 1.2, 0, Math.PI * 2);
+        this.ctx.arc(this.canvasWidth/2, this.canvasHeight/2, 1.5, 0, Math.PI * 2);
         this.ctx.fill();
     }
 }
