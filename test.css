@@ -1,0 +1,19 @@
+#cursor {
+    width: 14rem;
+}
+
+.controls {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+output {
+    display: inline-block;
+    width: 4ch;
+    font-family: monospace-ui, monospace;
+    text-align: center;
+}

@@ -7,6 +7,10 @@ const ctx = canvas.getContext("2d");
 const canvasWidth = canvas.width;
 const canvasHeight = canvas.height;
 
+const cursor = document.querySelector("#cursor");
+const label = document.querySelector("output");
+const btn = document.querySelector(".controls button");
+
 let skyColors,
     starfield,
     sun,
@@ -28,9 +32,11 @@ const getWeather = async function () {
     if (savedWeather) {
         const t = Date.now();
         const savedTime = parseInt(localStorage.getItem('currentTime'));
-        if ((t - savedTime)/1000 < 60*5) {
+        if ((t - savedTime) / 1000 < 60 * 5) {
             // Saved data is less than 5 minutes old
-            return JSON.parse(savedWeather);
+            const data = JSON.parse(savedWeather);
+            data.dt = Math.floor(t/1000); // update current time
+            return data;
         }
     }
 
@@ -73,6 +79,20 @@ const draw = function () {
     // requestAnimationFrame(draw);
 }
 
+const updateTime = function (d) {
+    // d: Date obj
+    label.textContent = `${d.getHours()}:${d.getMinutes().toString().padStart(2, "0")}`;
+}
+
+const update = function (d) {
+    updateTime(d);
+    const seconds = d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds();
+    starfield.angle = seconds;
+    cursor.value = seconds;
+    sun.theTime = d.getTime()/1000; // timestamp in seconds
+    draw();
+}
+
 window.addEventListener('load', ev => {
     getWeather()
         .then(data => {
@@ -87,9 +107,20 @@ window.addEventListener('load', ev => {
             sun = new Sun(canvasWidth, canvasHeight);
             sun.sunriseTime = data.sunrise;
             sun.sunsetTime = data.sunset;
-            sun.theTime = data.dt;
             sunPathImage = sun.thePath;
+            update(new Date(data.dt * 1000));
 
             draw();
-        })
+        });
+
+    cursor.addEventListener("input", ev => {
+        const val = parseInt(ev.target.value);
+        const d = new Date();
+        d.setHours(0,0,val,0);
+        update(d);
+    });
+
+    btn.addEventListener("click", ev => {
+        update(new Date());
+    });
 });
