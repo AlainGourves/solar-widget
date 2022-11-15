@@ -51,7 +51,7 @@ const draw = function () {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-    const pos = sun.theSin;
+    const pos = sun.theSin; // value in [0,1]
     const bg = skyColors.colorAt((1 + pos) * 50);
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
