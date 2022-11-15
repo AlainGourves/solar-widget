@@ -48,7 +48,7 @@ class Starfield {
         tmpCtx.drawImage(this.canvas, 0, 0, this.canvasWidth, this.canvasHeight);
         tmpCtx.restore();
 
-        const imageData = tmpCtx.getImageData((this.canvasWidth - this.resultWidth) / 2, ((this.canvasHeight - this.resultHeight) / 2) + 20, this.resultWidth, this.resultHeight);
+        const imageData = tmpCtx.getImageData((this.canvasWidth - this.resultWidth) / 2, ((this.canvasHeight - this.resultHeight) / 2), this.resultWidth, this.resultHeight);
 
         tmpCanvas.width = this.resultWidth;
         tmpCanvas.height = this.resultHeight;
