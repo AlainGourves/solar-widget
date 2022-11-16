@@ -1,6 +1,8 @@
 import Gradient from "./gradient.js";
 import Starfield from "./starfield.js";
 import Sun from "./sun.js";
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 class SolarWidget {
     // TODO: passer les param de l'url (dans un objet ?)
@@ -50,7 +52,8 @@ class SolarWidget {
                 throw new Error('Nothing to display !');
             }
 
-            if (this.params.lon && this.params.lat && this.params.apiKey) {
+            if (this.params.lon && this.params.lat) {
+                const apiKey = process.env.API_KEY;
                 this.url = `https://api.openweathermap.org/data/2.5/onecall?lat=${this.params.lat}&lon=${this.params.lon}&units=metric&exclude=alerts,daily,hourly,minutely&appid=${this.params.apiKey}`;
             }else{
                 throw new Error('Wrong parameters to request OpenWeatherMap API !');
