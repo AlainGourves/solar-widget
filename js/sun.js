@@ -3,6 +3,7 @@ class Sun {
         this.canvasWidth = w;
         this.canvasHeight = h;
         this.amplitude = this.canvasHeight / 3;
+        this.y = this.canvasHeight - (this.amplitude * 2);
 
         this.totalSeconds = 3600 * 24; // number of seconds in a day
         this.ppr = (Math.PI * 2) / this.canvasWidth; // number of radians per pixel
@@ -136,7 +137,7 @@ class Sun {
     drawSineWave = function (start, end, sty) {
         // start: start x position
         // end: end x position
-        this.ctxPath.translate(0, this.canvasHeight - this.amplitude * 2);
+        this.ctxPath.translate(0, this.y);
         this.ctxPath.beginPath();
         this.ctxPath.strokeStyle = sty;
         this.ctxPath.lineWidth = 3;
@@ -176,7 +177,7 @@ class Sun {
         // Reset current transformation matrix to the identity matrix
         this.ctxSun.setTransform(1, 0, 0, 1, 0, 0);
         this.ctxSun.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-        this.ctxSun.translate(0, this.canvasHeight - this.amplitude * 2);
+        this.ctxSun.translate(0, this.y);
 
         // the sun is above the horizon
         if (this.sunY < this.sunRadius) {
@@ -212,7 +213,7 @@ class Sun {
     drawSemiCircle = function (x, y) {
         // Reset current transformation matrix to the identity matrix
         this.ctxPath.setTransform(1, 0, 0, 1, 0, 0);
-        this.ctxPath.translate(0, this.canvasHeight - this.amplitude * 2);
+        this.ctxPath.translate(0, this.y);
         this.ctxPath.fillStyle = this.styleSunHidden;
         this.ctxPath.beginPath();
         this.ctxPath.arc(x, y, this.sunRadius, 0, Math.PI, true);
@@ -222,7 +223,7 @@ class Sun {
     drawTime = function (t, x, y) {
         // Reset current transformation matrix to the identity matrix
         this.ctxPath.setTransform(1, 0, 0, 1, 0, 0);
-        this.ctxPath.translate(0, this.canvasHeight - this.amplitude * 2);
+        this.ctxPath.translate(0, this.y);
         this.ctxPath.font = this.textFont;
         this.ctxPath.fillStyle = this.textColor;
         const delta = this.ctxPath.measureText(t).width / 2;

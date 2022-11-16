@@ -19,7 +19,10 @@ let dt;
 const temp = document.querySelector('.data li:first-of-type span');
 const hum = document.querySelector('.data li:last-of-type span');
 
-const url = 'https://api.openweathermap.org/data/2.5/onecall?lat=48.1124&lon=-1.6798&units=metric&exclude=alerts,daily,hourly,minutely&appid=19457e93f41f03d6b764271a2e6507f1';
+const lat = 48.1124;
+const lon = -1.6798;
+const apiKey = '19457e93f41f03d6b764271a2e6507f1';
+const url = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=metric&exclude=alerts,daily,hourly,minutely&appid=${apiKey}`;
 
 let skyGradientCtx;
 
@@ -51,15 +54,22 @@ const draw = function () {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-    const pos = sun.theSin; // value in [0,1]
-    const bg = skyColors.colorAt((1 + pos) * 50);
+    const pos = sun.theSin;
+    const threshold = sun.theThreshold;
+    let clr;
+    if (pos - threshold >= 0) {
+        clr = (pos - threshold) / (1 - threshold);
+    } else {
+        clr = (pos - threshold) / (2 * (1 - threshold));
+    }
+    const bg = skyColors.colorAt((1 + clr) * 50);
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-    if (pos < 0) {
+    if ((pos - threshold) < 0) {
         // night => starfield
-        // transparency  goes from 0% to 100% as pos goes from 0 to -0.15
-        if (pos >= -0.15) {
-            ctx.globalAlpha = Math.abs(pos) / 0.15;
+        // transparency  goes from 0% to 100% as (pos - threshold) goes from 0 to -0.15
+        if ((pos - threshold) >= -0.15) {
+            ctx.globalAlpha = Math.abs((pos - threshold)) / 0.15;
         } else {
             ctx.globalAlpha = 1;
         }
@@ -70,7 +80,6 @@ const draw = function () {
 
     sunImage = sun.theSun;
     ctx.drawImage(sunImage, 0, 0);
-    // requestAnimationFrame(draw);
 }
 
 window.addEventListener('load', ev => {

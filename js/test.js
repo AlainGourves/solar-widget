@@ -28,8 +28,6 @@ const lon = -1.6798;
 const apiKey = '19457e93f41f03d6b764271a2e6507f1';
 const url = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=metric&exclude=alerts,daily,hourly,minutely&appid=${apiKey}`;
 
-let skyGradientCtx;
-
 const getWeather = async function () {
     const savedWeather = localStorage.getItem('currentWeather');
     if (savedWeather) {
@@ -84,7 +82,6 @@ const draw = function () {
 
     sunImage = sun.theSun;
     ctx.drawImage(sunImage, 0, 0);
-    // requestAnimationFrame(draw);
 }
 
 const updateTime = function (d) {
@@ -104,8 +101,6 @@ const update = function (d) {
 window.addEventListener('load', ev => {
     getWeather()
         .then(data => {
-            console.log(data)
-
             const temperature = data.temp;
             const humidity = data.humidity;
             temp.innerHTML = `${Number.parseFloat(temperature).toFixed(1)}°C`;

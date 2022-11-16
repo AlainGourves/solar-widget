@@ -2,7 +2,7 @@ class Gradient {
     constructor() {
         this.canvas;
         this.ctx
-        this.canvasWidth = 10;
+        this.canvasWidth = 5;
         this.canvasHeight = 100;
         this.gradient;
 
@@ -33,7 +33,7 @@ class Gradient {
     }
 
     colorAt(y) {
-        const pixelData = this.ctx.getImageData(5,y,1,1);
+        const pixelData = this.ctx.getImageData(3,y,1,1);
         const color = `rgb(${pixelData.data[0]}, ${pixelData.data[1]}, ${pixelData.data[2]})`;
         return color;
     }
