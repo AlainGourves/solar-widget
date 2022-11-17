@@ -5,3 +5,23 @@ body {
     font-family: system-ui, sans-serif;
     background-color: deeppink;
 }
+
+
+.solar-widget__wrap{
+    width: 640px;
+    height: 360px;
+    display: grid;
+    place-content: center;
+
+    &>*{
+        grid-area: 1/1;
+    }
+}
+
+.solar-widget__loading{
+    z-index: 1;
+    display: grid;
+    place-content: center;
+    font-size: 2rem;
+    color: rebeccapurple;
+}
