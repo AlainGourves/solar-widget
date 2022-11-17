@@ -3,7 +3,7 @@ class Sun {
         this.canvasWidth = w;
         this.canvasHeight = h;
         this.amplitude = this.canvasHeight / 3;
-        this.y = this.canvasHeight - (this.amplitude * 2);
+        this.margin = this.amplitude / 2; // free space above & beyond the curve
 
         this.totalSeconds = 3600 * 24; // number of seconds in a day
         this.ppr = (Math.PI * 2) / this.canvasWidth; // number of radians per pixel
@@ -87,21 +87,26 @@ class Sun {
     }
 
     init() {
-        // Compute the timestamp of today at 0:00:00
+        // Compute the timestamp of today at 0:00:00 & 24:00:00
         const d = new Date(this.sunrise * 1000);
         d.setHours(0, 0, 0, 0);
         this.tStart = d.getTime() / 1000;
         this.tEnd = this.tStart + this.totalSeconds;
 
-        // Compenser la différence entre [0:00:00, sunrise] et [sunset, 24:00:00]
+        // Account for the length difference between intervals [0:00:00, sunrise] & [sunset, 24:00:00]
         let delta = ((this.sunrise - this.tStart) - (this.tEnd - this.sunset)) / 2;
         this.horizontalOffset = this.secondsToRadian(delta);
 
-        // calcul de l'offset vertical : offset à ajouter à la formule pour calculer sunY de sorte que f(sunrise) = 0
+        // Compute vertical offset : offset to add to the sunY formula to make f(sunrise) = 0
         this.verticalOffset = this.calcSunY(this.calcSunX(this.sunrise)) * -1;
 
         this.sunriseX = this.calcSunX(this.sunrise);
         this.sunsetX = this.calcSunX(this.sunset);
+
+        // To center vertically the curve
+        const noonX = this.calcSunX(this.sunrise + (this.sunset - this.sunrise)/2);
+        const noonY = Math.abs(this.calcSunY(noonX));
+        this.y = this.margin + noonY;
 
         this.threshold = -1 * Math.cos(this.sunriseX * this.ppr - this.horizontalOffset);
         this.drawPath();

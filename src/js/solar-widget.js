@@ -19,8 +19,6 @@ class SolarWidget {
 
         this._temperature;
         this._humidity;
-
-        // this.init();
     }
 
     async init() {
@@ -35,7 +33,6 @@ class SolarWidget {
                     this._temperature = `${Number.parseFloat(data.temp).toFixed(1)}°C`;
                     this._humidity = `${data.humidity}%`;
                     this.draw();
-                    // return this;
                 });
         } catch (e) {
             console.error(e);
