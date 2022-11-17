@@ -130,13 +130,23 @@ class SolarWidget {
         this.ctx.drawImage(this.sunImage, 0, 0);
     }
 
-    refresh = function() {
+    refresh = function () {
         if (this._refreshDelay) {
             if (this.timeoutID) {
                 this.draw();
             }
             this.timeoutID = setTimeout(this.refresh.bind(this), this._refreshDelay);
         }
+    }
+
+    downloadStarfield = function () {
+        let res = this.starfield.downloadImage()
+        let anc = document.createElement('a')
+        anc.download = 'download'
+        anc.href = res;
+        document.body.appendChild(anc)
+        anc.click()
+        anc.remove()
     }
 }
 

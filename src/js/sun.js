@@ -18,7 +18,9 @@ class Sun {
         this.sunriseX = 0;
         this.sunsetX = 0;
 
-        // times
+        // The Time
+        // save time as timestamp in seconds (not milliseconds !!!)
+        // or as formatted strings
         this.tStart = 0; // 0:00:00
         this.tEnd = 0; // 24:00:00
         this.sunrise = 0;
@@ -27,16 +29,21 @@ class Sun {
         this.sunriseFormatted = '';
         this.sunsetFormatted = '';
 
+        // Canvas to draw the background of the graph (sinewave, horizon, semi-circles, etc.)
         this.canvasPath = document.createElement('canvas');
         this.ctxPath = this.canvasPath.getContext('2d');
         this.canvasPath.width = this.canvasWidth;
         this.canvasPath.height = this.canvasHeight;
 
+        // Canvas to draw only the sun at his position
         this.canvasSun = document.createElement('canvas');
         this.ctxSun = this.canvasSun.getContext('2d');
         this.canvasSun.width = this.canvasWidth;
         this.canvasSun.height = this.canvasHeight;
 
+
+        // Customization
+        this.sunPathStokeWidth = 4;
         this.sunRadius = 16;
         this.sunBlur = 6;
         this.strokeStyleLight = '#ffffffaa';
@@ -104,7 +111,7 @@ class Sun {
         this.sunsetX = this.calcSunX(this.sunset);
 
         // To center vertically the curve
-        const noonX = this.calcSunX(this.sunrise + (this.sunset - this.sunrise)/2);
+        const noonX = this.calcSunX(this.sunrise + (this.sunset - this.sunrise) / 2);
         const noonY = Math.abs(this.calcSunY(noonX));
         this.y = this.margin + noonY;
 
@@ -139,42 +146,60 @@ class Sun {
         return (this.amplitude * Math.cos(x - this.horizontalOffset)) + this.verticalOffset;
     }
 
-    drawSineWave = function (start, end, sty) {
+    drawSineWave = function (start, end, sty, pos) {
         // start: start x position
         // end: end x position
+        // sty: stroke style
+        // pos: position of the clipping mask 'up'|'down'
         this.ctxPath.translate(0, this.y);
+        // Clipping mask (to have "flat" line caps)
+        this.ctxPath.save()
+        this.ctxPath.beginPath();
+        let diviser = (pos === 'up') ? -2 : 2;
+        this.ctxPath.rect(0, 0, this.canvasWidth, this.canvasHeight / diviser);
+        this.ctxPath.clip();
         this.ctxPath.beginPath();
         this.ctxPath.strokeStyle = sty;
-        this.ctxPath.lineWidth = 3;
-        for (let i = start; i <= end; i++) {
+        this.ctxPath.lineWidth = this.sunPathStokeWidth;
+        this.ctxPath.lineCap = 'square';
+        for (let i = start - 1; i <= end; i++) {
             const y = this.calcSunY(i);
             this.ctxPath.lineTo(i, y);
         }
         this.ctxPath.stroke();
+        this.ctxPath.restore();
         // Reset current transformation matrix to the identity matrix
         this.ctxPath.setTransform(1, 0, 0, 1, 0, 0);
     };
 
     drawPath = function () {
-        this.drawSineWave(0, this.sunriseX, this.strokeStyleDark);
-        this.drawSineWave(this.sunriseX, this.sunsetX, this.strokeStyleLight);
-        this.drawSineWave(this.sunsetX, this.canvasWidth, this.strokeStyleDark);
+        this.drawSineWave(0, this.sunriseX, this.strokeStyleDark, 'down');
+        this.drawSineWave(this.sunriseX, this.sunsetX, this.strokeStyleLight, 'up');
+        this.drawSineWave(this.sunsetX, this.canvasWidth, this.strokeStyleDark, 'down');
 
-        // sunrise
+        // sun @ sunrise
         this.drawSemiCircle(this.sunriseX, 0);
-        // sunrise
+        // sun @ sunrise
         this.drawSemiCircle(this.sunsetX, 0);
 
         // Time
         this.drawTime(this.sunriseFormatted, this.sunriseX, 0);
         this.drawTime(this.sunsetFormatted, this.sunsetX, 0);
 
-        // horizontal line
-        this.ctxPath.strokeStyle = this.strokeStyleLight;
+        // "Horizon"
+
+
+        // Gradient
+        const gradient = this.ctxPath.createLinearGradient(this.sunriseX - (4 * this.sunRadius), 0, this.sunsetX + (4 * this.sunRadius), 0);
+        gradient.addColorStop(0, '#ffffff00');
+        gradient.addColorStop(0.05, this.strokeStyleLight);
+        gradient.addColorStop(0.95, this.strokeStyleLight);
+        gradient.addColorStop(1, '#ffffff00');
+        this.ctxPath.strokeStyle = gradient;
         this.ctxPath.beginPath();
-        this.ctxPath.moveTo(this.sunriseX - (2 * this.sunRadius), 0);
+        this.ctxPath.moveTo(this.sunriseX - (4 * this.sunRadius), 0);
         this.ctxPath.lineWidth = 2;
-        this.ctxPath.lineTo(this.sunsetX + (2 * this.sunRadius), 0);
+        this.ctxPath.lineTo(this.sunsetX + (4 * this.sunRadius), 0);
         this.ctxPath.stroke();
     }
 

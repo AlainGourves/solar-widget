@@ -1,15 +1,8 @@
 class Gradient {
     constructor() {
-        this.canvas;
-        this.ctx
         this.canvasWidth = 5;
         this.canvasHeight = 100;
-        this.gradient;
 
-        this.init();
-    }
-
-    init() {
         this.canvas = document.createElement('canvas');
         this.canvas.width = this.canvasWidth;
         this.canvas.height = this.canvasHeight;
@@ -32,12 +25,15 @@ class Gradient {
         this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
     }
 
+    // Get the color of pixels at height y of the gradient
+    // And return the `rgb(red, green, blue) string
     colorAt(y) {
         const pixelData = this.ctx.getImageData(3,y,1,1);
-        const color = `rgb(${pixelData.data[0]}, ${pixelData.data[1]}, ${pixelData.data[2]})`;
-        return color;
+        return `rgb(${pixelData.data[0]}, ${pixelData.data[1]}, ${pixelData.data[2]})`;
     }
 
+    // Getter
+    // Returns the image of the gradient
     get image() {
         return this.canvas;
     }
