@@ -1,6 +1,5 @@
 import '../scss/style.scss'
 import SolarWidget from "./solar-widget.js";
-// console.log("ENV:", import.meta.env);
 
 document.querySelector('#app').innerHTML = `
     <h1>Right Here, Right Now</h1>
@@ -24,11 +23,14 @@ const temp = document.querySelector('.data li:first-of-type span');
 const hum = document.querySelector('.data li:last-of-type span');
 
 async function main() {
+    // Promises handling cf. https://stackoverflow.com/questions/72544385/handling-of-async-data-in-js-class
     const widget = new SolarWidget(canvas, params);
     await widget.init()
     loading.style.display = 'none';
     temp.innerHTML = widget.temperature;
     hum.innerHTML = widget.humidity;
+    widget.refreshDelay = 60000; // redraw every minute
+    widget.refresh()
 }
 
 window.addEventListener('load', ev => {

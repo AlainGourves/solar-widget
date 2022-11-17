@@ -17,6 +17,9 @@ class SolarWidget {
         this.sun = new Sun(this.canvasWidth, this.canvasHeight);
         this.sunPathImage;
 
+        this._refreshDelay = null;
+        this.timeoutID;
+
         this._temperature;
         this._humidity;
     }
@@ -53,6 +56,13 @@ class SolarWidget {
         return false;
     }
 
+    set refreshDelay(t) {
+        if (Number.isInteger(t)) {
+            clearTimeout(this.timeoutID);
+            this._refreshDelay = t;
+        }
+    }
+
     getWeather = async function () {
         const savedWeather = localStorage.getItem('currentWeather');
         if (savedWeather) {
@@ -80,7 +90,7 @@ class SolarWidget {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
-        console.log(data.current)
+        // console.log(data.current)
 
         localStorage.setItem('currentWeather', JSON.stringify(data.current));
         localStorage.setItem('currentTime', Date.now());
@@ -118,6 +128,15 @@ class SolarWidget {
 
         this.sunImage = this.sun.theSun;
         this.ctx.drawImage(this.sunImage, 0, 0);
+    }
+
+    refresh = function() {
+        if (this._refreshDelay) {
+            if (this.timeoutID) {
+                this.draw();
+            }
+            this.timeoutID = setTimeout(this.refresh.bind(this), this._refreshDelay);
+        }
     }
 }
 
