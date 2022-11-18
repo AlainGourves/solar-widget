@@ -63,6 +63,18 @@ class SolarWidget {
         }
     }
 
+    set time(d) {
+        // d: date obj
+        this.sun.theTime = d.getTime() / 1000; // timestamp in seconds
+        const seconds = d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds();
+        this.starfield.angle = seconds;
+        this.draw();
+    }
+
+    get dt() {
+        return this.sun.dt;
+    }
+
     getWeather = async function () {
         const savedWeather = localStorage.getItem('currentWeather');
         if (savedWeather) {
@@ -108,7 +120,7 @@ class SolarWidget {
         if (pos - threshold >= 0) {
             clr = (pos - threshold) / (1 - threshold);
         } else {
-            clr = (pos - threshold) / (2 * (1 - threshold));
+            clr = (pos - threshold) / (1 + threshold);
         }
         const bg = this.skyColors.colorAt((1 + clr) * 50);
         this.ctx.fillStyle = bg;
