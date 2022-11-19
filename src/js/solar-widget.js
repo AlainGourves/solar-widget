@@ -3,19 +3,21 @@ import Starfield from "./starfield.js";
 import Sun from "./sun.js";
 
 class SolarWidget {
-    constructor(canvas, params) {
+    constructor(canvas, { lat, lon, apiKey }) {
         this.canvas = canvas;
-        this.params = params;
+        this.lat = lat;
+        this.lon = lon;
+        this.apiKey = apiKey;
         this.ctx = this.canvas.getContext("2d");
         this.canvasWidth = this.canvas.width;
         this.canvasHeight = this.canvas.height;
 
         this.url = '';
+        this.fetchInterval = 60 * 5 * 1000; // time in seconds between requests to openWeatherMap API
 
         this.skyColors = new Gradient();
         this.starfield = new Starfield(this.canvasWidth, this.canvasHeight);
-        this.sun = new Sun(this.canvasWidth, this.canvasHeight);
-        this.sunPathImage;
+        this.sun;
 
         this._refreshDelay = null;
         this.timeoutID;
@@ -28,10 +30,11 @@ class SolarWidget {
         try {
             await this.getWeather()
                 .then(data => {
+                    this.sun = new Sun(this.canvasWidth, this.canvasHeight);
                     this.sun.sunriseTime = data.sunrise;
                     this.sun.sunsetTime = data.sunset;
+                    this.sun.init();
                     this.sun.theTime = data.dt;
-                    this.sunPathImage = this.sun.thePath;
 
                     this._temperature = `${Number.parseFloat(data.temp).toFixed(1)}°C`;
                     this._humidity = `${data.humidity}%`;
@@ -65,7 +68,7 @@ class SolarWidget {
 
     set time(d) {
         // d: date obj
-        this.sun.theTime = d.getTime() / 1000; // timestamp in seconds
+        this.sun.theTime = Math.floor(d.getTime() / 1000); // timestamp in seconds
         const seconds = d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds();
         this.starfield.angle = seconds;
         this.draw();
@@ -80,14 +83,14 @@ class SolarWidget {
         if (savedWeather) {
             const t = Date.now();
             const savedTime = parseInt(localStorage.getItem('currentTime'));
-            if ((t - savedTime) / 1000 < 60 * 5) {
+            if ((t - savedTime) < this.fetchInterval) {
                 // Saved data is less than 5 minutes old
                 return JSON.parse(savedWeather);
             }
         }
 
-        if (this.params.lon && this.params.lat && this.params.apiKey) {
-            this.url = `https://api.openweathermap.org/data/2.5/onecall?lat=${this.params.lat}&lon=${this.params.lon}&units=metric&exclude=alerts,daily,hourly,minutely&appid=${this.params.apiKey}`;
+        if (this.lon && this.lat && this.apiKey) {
+            this.url = `https://api.openweathermap.org/data/2.5/onecall?lat=${this.lat}&lon=${this.lon}&units=metric&exclude=alerts,daily,hourly,minutely&appid=${this.apiKey}`;
         } else {
             throw new Error('Wrong parameters to request OpenWeatherMap API !');
         }
@@ -136,7 +139,7 @@ class SolarWidget {
             this.ctx.drawImage(this.starfield.image, 0, 0);
             this.ctx.globalAlpha = 1;
         }
-        this.ctx.drawImage(this.sunPathImage, 0, 0);
+        this.ctx.drawImage(this.sun.thePath, 0, 0);
 
         this.sunImage = this.sun.theSun;
         this.ctx.drawImage(this.sunImage, 0, 0);
@@ -144,12 +147,19 @@ class SolarWidget {
 
     refresh = function () {
         if (this._refreshDelay) {
+            // call draw() if & only if this.timeoutID is already defined
+            // to avoid calling draw() twice at the beginning
             if (this.timeoutID) {
-                // call draw() if & only if this.timeoutID is already defined
-                // to avoid calling draw() twice at the beginning
-                const d = new Date()
-                console.log(`${d.getHours()}:${d.getMinutes()}`)
-                this.draw();
+                const d = new Date();
+                // Check if data stored in localStorage is still fresh
+                const savedTime = parseInt(localStorage.getItem('currentTime'));
+                if (savedTime && (d.getTime() - savedTime >= this.fetchInterval)) {
+                    // fetch fresh data from openWeatherMap
+                    this.init();
+                    this.timeoutID = setTimeout(this.refresh.bind(this), this._refreshDelay);
+                    return;
+                }
+                this.time = d; // redraw this the new time
             }
             this.timeoutID = setTimeout(this.refresh.bind(this), this._refreshDelay);
         }
@@ -157,6 +167,26 @@ class SolarWidget {
 
     downloadStarfield = function () {
         let res = this.starfield.downloadImage()
+        let anc = document.createElement('a')
+        anc.download = 'download'
+        anc.href = res;
+        document.body.appendChild(anc)
+        anc.click()
+        anc.remove()
+    }
+
+    downloadSun = function () {
+        let res = this.sun.downloadImage()
+        let anc = document.createElement('a')
+        anc.download = 'download'
+        anc.href = res;
+        document.body.appendChild(anc)
+        anc.click()
+        anc.remove()
+    }
+
+    downloadSunPath = function () {
+        let res = this.sun.downloadPathImage()
         let anc = document.createElement('a')
         anc.download = 'download'
         anc.href = res;

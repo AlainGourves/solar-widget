@@ -65,7 +65,6 @@ class Sun {
         if (t !== 0 && this.sunrise !== 0) {
             this.sunset = t;
             this.sunsetFormatted = this.formatTime(t);
-            this.init();
         }
     }
 
@@ -173,6 +172,7 @@ class Sun {
     };
 
     drawPath = function () {
+        this.ctxPath.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
         this.drawSineWave(0, this.sunriseX, this.strokeStyleDark, 'down');
         this.drawSineWave(this.sunriseX, this.sunsetX, this.strokeStyleLight, 'up');
         this.drawSineWave(this.sunsetX, this.canvasWidth, this.strokeStyleDark, 'down');
@@ -188,7 +188,6 @@ class Sun {
 
         // "Horizon"
 
-
         // Gradient
         const gradient = this.ctxPath.createLinearGradient(this.sunriseX - (4 * this.sunRadius), 0, this.sunsetX + (4 * this.sunRadius), 0);
         gradient.addColorStop(0, '#ffffff00');
@@ -201,6 +200,8 @@ class Sun {
         this.ctxPath.lineWidth = 2;
         this.ctxPath.lineTo(this.sunsetX + (4 * this.sunRadius), 0);
         this.ctxPath.stroke();
+        // Reset current transformation matrix to the identity matrix
+        this.ctxSun.setTransform(1, 0, 0, 1, 0, 0);
     }
 
     drawSun() {
@@ -266,6 +267,14 @@ class Sun {
             .getMinutes()
             .toString()
             .padStart(2, "0")}`;
+    }
+
+    // à virer après
+    downloadImage = function () {
+        return this.canvasSun.toDataURL()
+    }
+    downloadPathImage = function () {
+        return this.canvasPath.toDataURL()
     }
 }
 
