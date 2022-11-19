@@ -58,7 +58,7 @@ class SolarWidget {
 
     set refreshDelay(t) {
         if (Number.isInteger(t)) {
-            clearTimeout(this.timeoutID);
+            if (this.timeoutID) clearTimeout(this.timeoutID);
             this._refreshDelay = t;
         }
     }
@@ -133,6 +133,10 @@ class SolarWidget {
     refresh = function () {
         if (this._refreshDelay) {
             if (this.timeoutID) {
+                // call draw() if & only if this.timeoutID is already defined
+                // to avoid calling draw() twice at the beginning
+                const d = new Date()
+                console.log(`${d.getHours()}:${d.getMinutes()}`)
                 this.draw();
             }
             this.timeoutID = setTimeout(this.refresh.bind(this), this._refreshDelay);

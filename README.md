@@ -1,6 +1,6 @@
 # Solar Widget
 
-## Installation
+## Usage
 
 ### HTML
 
