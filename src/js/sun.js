@@ -266,7 +266,12 @@ class Sun {
         // rounded rect
         this.ctxPath.fillStyle = this.strokeStyleDark;
         this.ctxPath.beginPath();
-        this.ctxPath.roundRect(x - m, y + m, metrics.width + 2 * m, -1 * (2 * m + metrics.actualBoundingBoxAscent), m);
+        if (this.ctxPath.roundRect) {
+            this.ctxPath.roundRect(x - m, y + m, metrics.width + 2 * m, -1 * (2 * m + metrics.actualBoundingBoxAscent), m);
+        }else{
+            // Firefox doesn't support roundRect()
+            this.ctxPath.rect(x - m, y + m, metrics.width + 2 * m, -1 * (2 * m + metrics.actualBoundingBoxAscent), m);
+        }
         this.ctxPath.fill();
         this.ctxPath.fillStyle = this.textColor;
         this.ctxPath.shadowOffsetX = 1;
