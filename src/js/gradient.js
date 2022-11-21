@@ -6,7 +6,7 @@ class Gradient {
         this.canvas = document.createElement('canvas');
         this.canvas.width = this.canvasWidth;
         this.canvas.height = this.canvasHeight;
-        this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
+        this.ctx = this.canvas.getContext('2d', { willReadFrequently: true, alpha: false });
 
         this.gradient = this.ctx.createLinearGradient(0, 0, 0, 100);
         this.gradient.addColorStop(0, "hsl(233deg 22% 7%)");

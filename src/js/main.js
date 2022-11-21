@@ -1,17 +1,6 @@
 import '../scss/style.scss'
 import SolarWidget from "./solar-widget.js";
 
-const widgetWidth = 640 * 1.125;
-const widgetHeight = 360 * 1.125;
-document.documentElement.style.setProperty('--sw-canvas-w', `${widgetWidth}px`);
-document.documentElement.style.setProperty('--sw-canvas-h', `${widgetHeight}px`);
-
-const params = {
-    lat: 48.1124,
-    lon: -1.6798,
-    apiKey: import.meta.env.VITE_API_KEY
-}
-
 document.querySelector('#app').innerHTML = `
 <h1>Right Here, Right Now</h1>
 <ul class="data">
@@ -27,23 +16,35 @@ document.querySelector('#app').innerHTML = `
 `;
 
 const parent = document.querySelector('.solar-parent');
-const loading = document.querySelector('.solar-widget__loading');
 const temp = document.querySelector('.data li:first-of-type span');
 const hum = document.querySelector('.data li:last-of-type span');
 
 const btn = document.querySelector('button#bob');
 const btnSun = document.querySelector('button#sun');
 const btnSunPath = document.querySelector('button#sun-path');
+
+// For the widget :
+const widgetWidth = 640 * 2;//1.125;
+const widgetHeight = 360 * 2;//1.125;
+document.documentElement.style.setProperty('--sw-canvas-w', `${widgetWidth}px`);
+document.documentElement.style.setProperty('--sw-canvas-h', `${widgetHeight}px`);
+
+const params = {
+    lat: 48.1124,
+    lon: -1.6798,
+    apiKey: import.meta.env.VITE_API_KEY
+}
+
 let widget;
 
 async function main() {
     // Promises handling cf. https://stackoverflow.com/questions/72544385/handling-of-async-data-in-js-class
     widget = new SolarWidget(parent, params);
     widget.clipping = true;
+    widget.refreshDelay = 60000; // redraw every minute
     await widget.init()
     temp.innerHTML = widget.temperature;
     hum.innerHTML = widget.humidity;
-    widget.refreshDelay = 60000; // redraw every minute
     widget.refresh();
 }
 

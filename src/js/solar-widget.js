@@ -9,8 +9,7 @@ class SolarWidget {
 <div class="solar-widget__wrap">
     <div class="solar-widget__loading">Loading...</div>
     <canvas  class="solar-widget__canvas">Solar Potion Widget</canvas>
-</div>
-`;
+</div>`;
         parent.classList.add('solar-widget__wrap');
         parent.appendChild(this.template.content.cloneNode(true));
         const parentBounding = parent.getBoundingClientRect()
@@ -21,9 +20,13 @@ class SolarWidget {
         this.lat = lat;
         this.lon = lon;
         this.apiKey = apiKey;
-        this.ctx = this.canvas.getContext("2d");
-        this.canvas.width = parentBounding.width;
-        this.canvas.height = parentBounding.height;
+        this.ctx = this.canvas.getContext('2d');
+        // optimization for "retina" screens
+        // cf. https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas#scaling_for_high_resolution_displays
+        const dpr = window.devicePixelRatio;
+        this.ctx.scale(dpr, dpr);
+        this.canvas.width = parentBounding.width * dpr;
+        this.canvas.height = parentBounding.height * dpr;
 
         this.url = '';
         this.fetchInterval = 60 * 5 * 1000; // time in seconds between requests to openWeatherMap API
