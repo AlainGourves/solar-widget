@@ -1,10 +1,11 @@
 import '../scss/style.scss'
 import SolarWidget from "./solar-widget.js";
 
-const widgetWidth = 640 * 1.125;
-const widgetHeight = 360 * 1.125;
+const widgetWidth = 640 * 2;//1.125;
+const widgetHeight = 360 * 2;//1.125;
 document.documentElement.style.setProperty('--sw-canvas-w', `${widgetWidth}px`);
 document.documentElement.style.setProperty('--sw-canvas-h', `${widgetHeight}px`);
+
 const params = {
     lat: 48.1124,
     lon: -1.6798,
@@ -36,40 +37,19 @@ const btnSun = document.querySelector('button#sun');
 const btnSunPath = document.querySelector('button#sun-path');
 let widget;
 
-const squircle = (el) => {
-    const w = el.offsetWidth;
-    const h = el.offsetHeight;
-    if (!h || !w) return;
-    const dir = w === Math.max(w, h) ? "w" : "h";
-    const rad = Math.min(w, h) / 2; // "corner radius"
-
-    let path = `M0,${rad}C0,0 0,0 ${rad},0`;
-    if (dir === "w" && w !== h) path += `H${w - rad}`;
-    path += `C${w},0 ${w},0 ${w},${rad}`;
-    if (dir === "h" && w !== h) path += `V${h - rad}`;
-    path += `C${w},${h} ${w},${h} ${w - rad},${h}`;
-    if (dir === "w" && w !== h) path += `H${rad}`;
-    path += `C0,${h} 0,${h} 0,${h - rad}`;
-    if (dir === "h" && w !== h) path += `V${rad}`;
-    path += "Z";
-    return { w, h, path };
-};
-
 async function main() {
     // Promises handling cf. https://stackoverflow.com/questions/72544385/handling-of-async-data-in-js-class
     widget = new SolarWidget(canvas, params);
+    widget.clipping = true;
     await widget.init()
     loading.style.display = 'none';
     temp.innerHTML = widget.temperature;
     hum.innerHTML = widget.humidity;
-    widget.refreshDelay = 60000; // redraw every minute
+    widget.refreshDelay = 10000; // redraw every minute
     widget.refresh();
 }
 
 window.addEventListener('load', ev => {
-    const path = squircle(canvas);
-    canvas.style.clipPath = `path("${path.path}")`;
-
     main();
 
     btn.addEventListener('click', ev => {

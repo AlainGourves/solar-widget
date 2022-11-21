@@ -24,6 +24,8 @@ class SolarWidget {
 
         this._temperature;
         this._humidity;
+
+        this._clipping = false;
     }
 
     async init() {
@@ -78,6 +80,10 @@ class SolarWidget {
         return this.sun.dt;
     }
 
+    set clipping(bool) {
+        this._clipping = bool;
+    }
+
     getWeather = async function () {
         const savedWeather = localStorage.getItem('currentWeather');
         if (savedWeather) {
@@ -125,11 +131,23 @@ class SolarWidget {
         } else {
             clr = (pos - threshold) / (1 + threshold);
         }
+
+        // Clipping path
+        if (this._clipping) {
+            this.ctx.save();
+            this.ctx.fillStyle = 'red';
+            // this.ctx.beginPath();
+            const path = new Path2D(this.squircle());
+            // this.ctx.fill(path);
+            this.ctx.clip(path);
+        }
+        this.ctx.fillStyle = 'blue';
+        this.ctx.fillRect(400,300, 300,300);
         const bg = this.skyColors.colorAt((1 + clr) * 50);
         this.ctx.fillStyle = bg;
         this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
         if ((pos - threshold) < 0) {
-            // night => starfield
+            // true only at night time => draw a starfield
             // transparency  goes from 0% to 100% as (pos - threshold) goes from 0 to -0.15
             if ((pos - threshold) >= -0.15) {
                 this.ctx.globalAlpha = Math.abs((pos - threshold)) / 0.15;
@@ -143,6 +161,7 @@ class SolarWidget {
 
         this.sunImage = this.sun.theSun;
         this.ctx.drawImage(this.sunImage, 0, 0);
+        this.ctx.restore();
     }
 
     refresh = function () {
@@ -160,10 +179,29 @@ class SolarWidget {
                     return;
                 }
                 this.time = d; // redraw this the new time
+                // console.log(d)
             }
             this.timeoutID = setTimeout(this.refresh.bind(this), this._refreshDelay);
         }
     }
+
+    squircle = function () {
+        const w = this.canvasWidth;
+        const h = this.canvasHeight;
+        const dir = w === Math.max(w, h) ? "w" : "h";
+        const rad = Math.min(w, h) / 2; // "corner radius"
+
+        let path = `M0,${rad}C0,0 0,0 ${rad},0`;
+        if (dir === "w" && w !== h) path += `H${w - rad}`;
+        path += `C${w},0 ${w},0 ${w},${rad}`;
+        if (dir === "h" && w !== h) path += `V${h - rad}`;
+        path += `C${w},${h} ${w},${h} ${w - rad},${h}`;
+        if (dir === "w" && w !== h) path += `H${rad}`;
+        path += `C0,${h} 0,${h} 0,${h - rad}`;
+        if (dir === "h" && w !== h) path += `V${rad}`;
+        path += "Z";
+        return path;
+    };
 
     downloadStarfield = function () {
         let res = this.starfield.downloadImage()
