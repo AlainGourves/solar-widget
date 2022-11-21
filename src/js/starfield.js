@@ -23,14 +23,13 @@ class Starfield {
         this.sfCanvas.height = this.resultHeight;
 
         // Stars
-        this.nbStars = 8000;
-        this.starColor = '#fff';
+        this.nbStars = Math.floor((this.canvasWidth * this.canvasWidth) /200); // # of stars is linked to the dimensions of the canvas
         // Generate the stars
         let tmpStars = [];
         for (let i = 0; i < this.nbStars; i++) {
             tmpStars.push(this.addStar());
         }
-        this.stars = tmpStars.filter(star => star.r > 0.5); // filters out the smallest stars
+        this.stars = tmpStars.filter(star => star.r > 0.3); // filters out the smallest stars
 
         this._angle = 0; // angle of rotation of the sky
         this.angleStep = (Math.PI * 2) / (3600 * 24);
@@ -97,23 +96,32 @@ class Starfield {
             let h = (r > 0.5) ? 1 + (Math.random() * 40) : 190 + (Math.random() * 90);
             let c = `hsl(${Math.floor(h)}, 100%, ${Math.floor(80 + Math.random() * 20)}%)`;
             this.ctx.fillStyle = c;
-            if (star.r >= 1) {
-                this.ctx.shadowColor = c;
-                this.ctx.shadowBlur = 4 + (Math.random() * 6);
-            }
             this.ctx.beginPath();
             this.ctx.globalAlpha = 0.25 + Math.random()/2;
             this.ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
             this.ctx.fill();
         });
         // Pole Star (at the center)
-        this.ctx.fillStyle = this.starColor;
-        this.ctx.shadowColor = this.starColor;
-        this.ctx.shadowBlur = 10;
+        this.ctx.fillStyle = '#fff';
+        this.ctx.shadowColor = '#fff';
+        this.ctx.shadowBlur = 4;
         this.ctx.globalAlpha = 0.95;
         this.ctx.beginPath();
         this.ctx.arc(this.canvasWidth / 2, this.canvasHeight / 2, 1.5, 0, Math.PI * 2);
         this.ctx.fill();
+        this.ctx.shadowBlur = 0;
+        // Blur effect
+        const radii = [4,2,1]; // blur radii
+        const tmpCanvas = document.createElement('canvas');
+        const tmpCtx = tmpCanvas.getContext('2d');
+        tmpCanvas.width = this.canvasWidth;
+        tmpCanvas.height = this.canvasHeight;
+        radii.forEach(r => {
+            tmpCtx.filter = `blur(${r}px)`;
+            tmpCtx.drawImage(this.canvas, 0,0);
+        });
+        this.ctx.drawImage(tmpCanvas, 0,0); // copy tmpCanvas to this.canvas
+        tmpCanvas.remove();
     }
 }
 
