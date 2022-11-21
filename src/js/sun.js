@@ -46,12 +46,12 @@ class Sun {
         this.sunPathStokeWidth = 4;
         this.sunRadius = 16;
         this.sunBlur = 6;
-        this.strokeStyleLight = '#ffffffaa';
-        this.strokeStyleDark = '#ffffff44';
+        this.strokeStyleLight = '#ffffffbb';
+        this.strokeStyleDark = '#ffffff55';
         this.styleSunVisible = '#f9c50b';
-        this.styleSunHidden = '#ffffff44';
+        this.styleSunHidden = this.strokeStyleLight;
         this.textColor = 'deeppink';
-        this.textFont = 'bold 12px system-ui';
+        this.textFont = `bold clamp(11px, ${this.canvasHeight / (16 * 30)}rem, 2rem) system-ui`;
     }
 
     // Getters / Setters
@@ -255,10 +255,26 @@ class Sun {
         // Reset current transformation matrix to the identity matrix
         this.ctxPath.setTransform(1, 0, 0, 1, 0, 0);
         this.ctxPath.translate(0, this.y);
+        this.ctxPath.save();
         this.ctxPath.font = this.textFont;
+        const metrics = this.ctxPath.measureText(t);
+        const factor = (x < this.canvasWidth / 2) ? -1 : 1;
+        const m = this.sunRadius / 2; // margin
+        x = x + (m + this.sunRadius) * factor;
+        if (factor < 0) x -= metrics.width;
+        y = y - 2 * m;
+        // rounded rect
+        this.ctxPath.fillStyle = this.strokeStyleDark;
+        this.ctxPath.beginPath();
+        this.ctxPath.roundRect(x - m, y + m, metrics.width + 2 * m, -1 * (2 * m + metrics.actualBoundingBoxAscent), m);
+        this.ctxPath.fill();
         this.ctxPath.fillStyle = this.textColor;
-        const delta = this.ctxPath.measureText(t).width / 2;
-        this.ctxPath.fillText(t, x - delta, y + 16);
+        this.ctxPath.shadowOffsetX = 1;
+        this.ctxPath.shadowOffsetY = 1;
+        this.ctxPath.shadowColor = 'rgba(0,0,0,.25)';
+        this.ctxPath.shadowBlur = 2;
+        this.ctxPath.fillText(t, x, y);
+        this.ctxPath.restore();
     };
 
     formatTime = function (t) {
