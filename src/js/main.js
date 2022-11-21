@@ -1,8 +1,8 @@
 import '../scss/style.scss'
 import SolarWidget from "./solar-widget.js";
 
-const widgetWidth = 640 * 2;//1.125;
-const widgetHeight = 360 * 2;//1.125;
+const widgetWidth = 640 * 1.125;
+const widgetHeight = 360 * 1.125;
 document.documentElement.style.setProperty('--sw-canvas-w', `${widgetWidth}px`);
 document.documentElement.style.setProperty('--sw-canvas-h', `${widgetHeight}px`);
 
@@ -18,16 +18,15 @@ document.querySelector('#app').innerHTML = `
 <li>Température: <span></span></li>
 <li>Humidité relative: <span></span></li>
 </ul>
-<div class="solar-widget__wrap">
-<div class="solar-widget__loading">Loading...</div>
-<canvas  class="solar-widget__canvas"width="${widgetWidth}" height="${widgetHeight}"></canvas>
-</div>
+
+<div class="solar-parent"></div>
+
 <button id="bob">Download PNG</button>
 <button id="sun">Download Sun</button>
 <button id="sun-path">Download Sun Path</button>
 `;
 
-const canvas = document.querySelector("canvas");
+const parent = document.querySelector('.solar-parent');
 const loading = document.querySelector('.solar-widget__loading');
 const temp = document.querySelector('.data li:first-of-type span');
 const hum = document.querySelector('.data li:last-of-type span');
@@ -39,13 +38,12 @@ let widget;
 
 async function main() {
     // Promises handling cf. https://stackoverflow.com/questions/72544385/handling-of-async-data-in-js-class
-    widget = new SolarWidget(canvas, params);
+    widget = new SolarWidget(parent, params);
     widget.clipping = true;
     await widget.init()
-    loading.style.display = 'none';
     temp.innerHTML = widget.temperature;
     hum.innerHTML = widget.humidity;
-    widget.refreshDelay = 10000; // redraw every minute
+    widget.refreshDelay = 60000; // redraw every minute
     widget.refresh();
 }
 

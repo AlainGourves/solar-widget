@@ -3,20 +3,33 @@ import Starfield from "./starfield.js";
 import Sun from "./sun.js";
 
 class SolarWidget {
-    constructor(canvas, { lat, lon, apiKey }) {
-        this.canvas = canvas;
+    constructor(parent, { lat, lon, apiKey }) {
+        this.template = document.createElement('template');
+        this.template.innerHTML = `
+<div class="solar-widget__wrap">
+    <div class="solar-widget__loading">Loading...</div>
+    <canvas  class="solar-widget__canvas">Solar Potion Widget</canvas>
+</div>
+`;
+        parent.classList.add('solar-widget__wrap');
+        parent.appendChild(this.template.content.cloneNode(true));
+        const parentBounding = parent.getBoundingClientRect()
+
+        this.loading = parent.querySelector('.solar-widget__loading');
+        this.canvas = parent.querySelector('canvas.solar-widget__canvas');
+
         this.lat = lat;
         this.lon = lon;
         this.apiKey = apiKey;
         this.ctx = this.canvas.getContext("2d");
-        this.canvasWidth = this.canvas.width;
-        this.canvasHeight = this.canvas.height;
+        this.canvas.width = parentBounding.width;
+        this.canvas.height = parentBounding.height;
 
         this.url = '';
         this.fetchInterval = 60 * 5 * 1000; // time in seconds between requests to openWeatherMap API
 
         this.skyColors = new Gradient();
-        this.starfield = new Starfield(this.canvasWidth, this.canvasHeight);
+        this.starfield = new Starfield(this.canvas.width, this.canvas.height);
         this.sun;
 
         this._refreshDelay = null;
@@ -32,7 +45,7 @@ class SolarWidget {
         try {
             await this.getWeather()
                 .then(data => {
-                    this.sun = new Sun(this.canvasWidth, this.canvasHeight);
+                    this.sun = new Sun(this.canvas.width, this.canvas.height);
                     this.sun.sunriseTime = data.sunrise;
                     this.sun.sunsetTime = data.sunset;
                     this.sun.init();
@@ -41,6 +54,7 @@ class SolarWidget {
                     this._temperature = `${Number.parseFloat(data.temp).toFixed(1)}°C`;
                     this._humidity = `${data.humidity}%`;
                     this.draw();
+                    this.loading.style.display = 'none';
                 });
         } catch (e) {
             console.error(e);
@@ -121,7 +135,7 @@ class SolarWidget {
     draw = function () {
         // Reset current transformation matrix to the identity matrix
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-        this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         const pos = this.sun.theSin;
         const threshold = this.sun.theThreshold;
@@ -142,10 +156,10 @@ class SolarWidget {
             this.ctx.clip(path);
         }
         this.ctx.fillStyle = 'blue';
-        this.ctx.fillRect(400,300, 300,300);
+        this.ctx.fillRect(400, 300, 300, 300);
         const bg = this.skyColors.colorAt((1 + clr) * 50);
         this.ctx.fillStyle = bg;
-        this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         if ((pos - threshold) < 0) {
             // true only at night time => draw a starfield
             // transparency  goes from 0% to 100% as (pos - threshold) goes from 0 to -0.15
@@ -186,8 +200,8 @@ class SolarWidget {
     }
 
     squircle = function () {
-        const w = this.canvasWidth;
-        const h = this.canvasHeight;
+        const w = this.canvas.width;
+        const h = this.canvas.height;
         const dir = w === Math.max(w, h) ? "w" : "h";
         const rad = Math.min(w, h) / 2; // "corner radius"
 
