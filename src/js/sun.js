@@ -43,15 +43,16 @@ class Sun {
 
 
         // Customization
+        const dpr = window.devicePixelRatio; // 1 for "normal", 2 for "retina"
         this.sunPathStokeWidth = 4;
-        this.sunRadius = 16;
-        this.sunBlur = 6;
+        this.sunRadius = 16 * dpr;
+        this.sunBlur = 6 * dpr;
         this.strokeStyleLight = '#ffffffbb';
         this.strokeStyleDark = '#ffffff55';
         this.styleSunVisible = '#f9c50b';
         this.styleSunHidden = this.strokeStyleLight;
         this.textColor = 'deeppink';
-        this.textFont = `bold clamp(11px, ${this.canvasHeight / (16 * 30)}rem, 2rem) system-ui`;
+        this.textFont = `bold clamp(${11*dpr}px, ${this.canvasHeight / (16 * 30 * dpr)}rem, ${2*dpr}rem) system-ui`;
     }
 
     // Getters / Setters
