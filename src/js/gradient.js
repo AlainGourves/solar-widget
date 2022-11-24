@@ -28,7 +28,7 @@ class Gradient {
     // Get the color of pixels at height y of the gradient
     // And return the `rgb(red, green, blue) string
     colorAt(y) {
-        const pixelData = this.ctx.getImageData(3,y,1,1);
+        const pixelData = this.ctx.getImageData(3, y, 1, 1);
         return `rgb(${pixelData.data[0]}, ${pixelData.data[1]}, ${pixelData.data[2]})`;
     }
 
@@ -36,6 +36,15 @@ class Gradient {
     // Returns the image of the gradient
     get image() {
         return this.canvas;
+    }
+
+    // returns an array of colors from the gradient
+    get colors() {
+        let result = [];
+        for (let i = 0; i < 100; i++) {
+            result[i] = this.colorAt(i);
+        }
+        return result;
     }
 }
 
