@@ -45,7 +45,6 @@ async function main() {
     await widget.init()
     temp.innerHTML = widget.temperature;
     hum.innerHTML = widget.humidity;
-    widget.refresh();
 }
 
 window.addEventListener('load', ev => {

@@ -58,6 +58,7 @@ class SolarWidget {
                     this._humidity = `${data.humidity}%`;
                     this.draw();
                     this.loading.style.display = 'none';
+                    if (this._refreshDelay && !this.timeoutID) this.refresh();
                 });
         } catch (e) {
             console.error(e);
@@ -158,8 +159,6 @@ class SolarWidget {
             // this.ctx.fill(path);
             this.ctx.clip(path);
         }
-        this.ctx.fillStyle = 'blue';
-        this.ctx.fillRect(400, 300, 300, 300);
         const bg = this.skyColors.colorAt((1 + clr) * 50);
         this.ctx.fillStyle = bg;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -186,6 +185,7 @@ class SolarWidget {
             // call draw() if & only if this.timeoutID is already defined
             // to avoid calling draw() twice at the beginning
             if (this.timeoutID) {
+                clearTimeout(this.timeoutID);
                 const d = new Date();
                 // Check if data stored in localStorage is still fresh
                 const savedTime = parseInt(localStorage.getItem('currentTime'));
@@ -195,8 +195,7 @@ class SolarWidget {
                     this.timeoutID = setTimeout(this.refresh.bind(this), this._refreshDelay);
                     return;
                 }
-                this.time = d; // redraw this the new time
-                // console.log(d)
+                this.time = d; // redraw according to the new time
             }
             this.timeoutID = setTimeout(this.refresh.bind(this), this._refreshDelay);
         }
