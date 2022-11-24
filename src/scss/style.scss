@@ -27,8 +27,8 @@ body {
 }
 
 .solar-widget__wrap {
-    width: var(--sw-canvas-w);
-    height: var(--sw-canvas-h);
+    width: 70vw;
+    aspect-ratio: 16 / 9;
     display: grid;
     place-content: center;
 

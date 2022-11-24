@@ -10,12 +10,14 @@ class SolarWidget {
     <div class="solar-widget__loading">Loading...</div>
     <canvas  class="solar-widget__canvas">Solar Potion Widget</canvas>
 </div>`;
-        parent.classList.add('solar-widget__wrap');
-        parent.appendChild(this.template.content.cloneNode(true));
-        const parentBounding = parent.getBoundingClientRect()
 
-        this.loading = parent.querySelector('.solar-widget__loading');
-        this.canvas = parent.querySelector('canvas.solar-widget__canvas');
+        this.parent = parent;
+        this.parent.classList.add('solar-widget__wrap');
+        this.parent.appendChild(this.template.content.cloneNode(true));
+        const parentBounding = this.parent.getBoundingClientRect()
+
+        this.loading = this.parent.querySelector('.solar-widget__loading');
+        this.canvas = this.parent.querySelector('canvas.solar-widget__canvas');
 
         this.lat = lat;
         this.lon = lon;
@@ -28,11 +30,12 @@ class SolarWidget {
         this.canvas.width = parentBounding.width * dpr;
         this.canvas.height = parentBounding.height * dpr;
 
+
         this.url = '';
         this.fetchInterval = 60 * 5 * 1000; // time in seconds between requests to openWeatherMap API
 
         this.skyColors = new Gradient();
-        this.starfield = new Starfield(this.canvas.width, this.canvas.height);
+        this.starfield;
         this.sun;
 
         this._refreshDelay = null;
@@ -42,12 +45,32 @@ class SolarWidget {
         this._humidity;
 
         this._clipping = false;
+
+        // Resize observer
+        // reinitialize the widget when the new width is bigger
+        this.observerCallback = (entries) => {
+            for (const entry of entries) {
+                if (entry.borderBoxSize) {
+                    // obj with inlineSize & blockSize in px
+                    const box = entry.borderBoxSize[0]
+                    const newW = parseFloat(box.inlineSize);
+                    const newH = parseFloat(box.blockSize);
+                    if (newW > this.canvas.width){
+                        this.canvas.width = newW;
+                        this.canvas.height = newH;
+                        this.init()
+                    }
+                }
+            }
+        }
+        this.observer = new ResizeObserver(this.debounce(this.observerCallback, 250));
     }
 
     async init() {
         try {
             await this.getWeather()
                 .then(data => {
+                    this.starfield = new Starfield(this.canvas.width, this.canvas.height);
                     this.sun = new Sun(this.canvas.width, this.canvas.height);
                     this.sun.sunriseTime = data.sunrise;
                     this.sun.sunsetTime = data.sunset;
@@ -59,6 +82,9 @@ class SolarWidget {
                     this.draw();
                     this.loading.style.display = 'none';
                     if (this._refreshDelay && !this.timeoutID) this.refresh();
+
+                    // Mutation observer
+                    this.observer.observe(this.parent, this.observerOptions);
                 });
         } catch (e) {
             console.error(e);
@@ -248,6 +274,18 @@ class SolarWidget {
         anc.click()
         anc.remove()
     }
+
+    debounce = (func, delay) => {
+        let timer;
+        return function () {     //anonymous function
+            const context = this;
+            const args = arguments;
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                func.apply(context, args)
+            }, delay);
+        }
+    };
 }
 
 export default SolarWidget;

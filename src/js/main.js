@@ -24,11 +24,6 @@ const btnSun = document.querySelector('button#sun');
 const btnSunPath = document.querySelector('button#sun-path');
 
 // For the widget :
-const widgetWidth = 640 * 2;//1.125;
-const widgetHeight = 360 * 2;//1.125;
-document.documentElement.style.setProperty('--sw-canvas-w', `${widgetWidth}px`);
-document.documentElement.style.setProperty('--sw-canvas-h', `${widgetHeight}px`);
-
 const params = {
     lat: 48.1124,
     lon: -1.6798,
