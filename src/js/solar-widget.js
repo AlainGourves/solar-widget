@@ -55,7 +55,7 @@ class SolarWidget {
                     const box = entry.borderBoxSize[0]
                     const newW = parseFloat(box.inlineSize);
                     const newH = parseFloat(box.blockSize);
-                    if (newW > this.canvas.width){
+                    if (newW > this.canvas.width) {
                         this.canvas.width = newW;
                         this.canvas.height = newH;
                         this.init()
@@ -80,6 +80,7 @@ class SolarWidget {
                     this._temperature = `${Number.parseFloat(data.temp).toFixed(1)}°C`;
                     this._humidity = `${data.humidity}%`;
                     this.draw();
+                    if (this.loading.classList.contains('error')) this.loading.classList.remove('error');
                     this.loading.style.display = 'none';
                     if (this._refreshDelay && !this.timeoutID) this.refresh();
 
@@ -87,6 +88,12 @@ class SolarWidget {
                     this.observer.observe(this.parent, this.observerOptions);
                 });
         } catch (e) {
+            this.loading.style.display = 'grid';
+            this.loading.innerHTML = `<div>
+            <h2>Things happen...</h2>
+            <p>${e.message}</p>
+            </div>`;
+            this.loading.classList.add('error');
             console.error(e);
         }
     }
@@ -131,11 +138,12 @@ class SolarWidget {
     getWeather = async function () {
         const savedWeather = localStorage.getItem('currentWeather');
         if (savedWeather) {
-            const t = Date.now();
             const savedTime = parseInt(localStorage.getItem('currentTime'));
-            if ((t - savedTime) < this.fetchInterval) {
+            if ((Date.now() - savedTime) < this.fetchInterval) {
                 // Saved data is less than 5 minutes old
-                return JSON.parse(savedWeather);
+                return this.parseJSON(savedWeather);
+            }else{
+                localStorage.clear();// Clear localStorage
             }
         }
 
@@ -149,13 +157,17 @@ class SolarWidget {
             throw new Error('Nothing to display !');
         }
 
-
-        const response = await fetch(this.url);
+        let response;
+        try {
+            response = await fetch(this.url);
+        } catch (err) {
+            throw new Error(`Network error! ${err.message}`);
+        }
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        const data = await response.json();
-        // console.log(data.current)
+        const data = await response.json(); // data is a JS object
+        //  console.log(data.current)
 
         localStorage.setItem('currentWeather', JSON.stringify(data.current));
         localStorage.setItem('currentTime', Date.now());
@@ -180,9 +192,7 @@ class SolarWidget {
         if (this._clipping) {
             this.ctx.save();
             this.ctx.fillStyle = 'red';
-            // this.ctx.beginPath();
             const path = new Path2D(this.squircle());
-            // this.ctx.fill(path);
             this.ctx.clip(path);
         }
         const bg = this.skyColors.colorAt((1 + clr) * 50);
@@ -286,6 +296,16 @@ class SolarWidget {
             }, delay);
         }
     };
+
+    parseJSON = (data) => {
+        try {
+            const parsed = JSON.parse(data);
+            return parsed;
+        } catch (e) {
+            console.warn('parseJSON', e.message);
+            return undefined;
+        }
+    }
 }
 
 export default SolarWidget;

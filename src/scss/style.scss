@@ -1,12 +1,12 @@
 *,
 *::before,
 *::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-:root{
+:root {
     --sw-canvas-w: 400px;
     --sw-canvas-h: 225px;
     font-family: system-ui, sans-serif;
@@ -42,10 +42,24 @@ body {
     display: grid;
     place-content: center;
     font-size: 2rem;
-    color: rebeccapurple;
+    color: deeppink;
+
+    &.error {
+        background-color: rgb(222 25 108);
+        color: #fff;
+        font-size: 1.5rem;
+
+        & div {
+            border: 1px solid #fff;
+            padding: .5rem 1rem;
+            padding-inline-start: 5rem;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath style='fill:%23fff' d='M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7.2 40.1S486.3 480 472 480H40c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8.2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24v112c0 13.3 10.7 24 24 24s24-10.7 24-24V184c0-13.3-10.7-24-24-24zm32 224c0-17.7-14.3-32-32-32s-32 14.3-32 32 14.3 32 32 32 32-14.3 32-32z'/%3E%3C/svg%3E%0A") .75em 50% no-repeat;
+            background-size: 3rem 3rem;
+        }
+    }
 }
 
-.solar-widget__canvas{
+.solar-widget__canvas {
     display: block;
     width: 100%;
     height: 100%;
