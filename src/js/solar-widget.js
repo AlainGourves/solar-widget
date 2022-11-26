@@ -91,6 +91,7 @@ class SolarWidget {
             this.loading.innerHTML = `<div>
             <h2>Things happen...</h2>
             <p>${e.message}</p>
+            <p>Try to <a href="#" onclick="widget.init(); return false;">reload the widget</a></p>
             </div>`;
             this.loading.classList.add('error');
             console.error(e);

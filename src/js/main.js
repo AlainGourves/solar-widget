@@ -44,6 +44,7 @@ async function main() {
 
 window.addEventListener('load', ev => {
     main();
+    window.widget = widget; // makes it accessible
 
     btn.addEventListener('click', ev => {
         widget.downloadStarfield()
