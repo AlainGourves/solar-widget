@@ -21,7 +21,6 @@ document.querySelector('#app').innerHTML = `
 </ul>
 <div class="solar-parent"></div>
 
-<button id="bob">Download Starfield</button>
 <div class="controls">
         <label for="cursor">
             <input type="range" id="cursor" min="0" max="86399">
@@ -42,8 +41,6 @@ const cursor = document.querySelector("#cursor");
 const label = document.querySelector("output");
 const btnNow = document.querySelector(".controls button");
 
-const btnExport = document.querySelector('button#bob');
-
 let widget;
 
 const updateTime = function (d) {
@@ -61,11 +58,12 @@ const update = function (d) {
 async function main() {
     // Promises handling cf. https://stackoverflow.com/questions/72544385/handling-of-async-data-in-js-class
     widget = new SolarWidget(parent, params);
-    widget.clipping = false;
+    // widget.clipping = false;
     await widget.init()
     temp.innerHTML = widget.temperature;
     hum.innerHTML = widget.humidity;
     const d = new Date();
+    updateTime(d);
     d.setHours(0, 0, 0, 0);
     let cursorValue = widget.dt - (d.getTime() / 1000);
     cursor.value = cursorValue;
@@ -73,11 +71,6 @@ async function main() {
 
 window.addEventListener('load', ev => {
     main();
-
-    btnExport.addEventListener('click', ev => {
-        console.log('clic!')
-        widget.downloadStarfield()
-    })
 
     btnNow.addEventListener("click", ev => {
         update(new Date());

@@ -35,7 +35,7 @@ class SolarWidget {
         this.fetchInterval = 60 * 5 * 1000; // time in seconds between requests to openWeatherMap API
 
         this.skyColors = new Gradient();
-        this.starfield;
+        this.starfield = new Starfield(this.canvas.width, this.canvas.height);
         this.sun;
 
         this._refreshDelay = null;
@@ -70,15 +70,14 @@ class SolarWidget {
         try {
             await this.getWeather()
                 .then(data => {
-                    this.starfield = new Starfield(this.canvas.width, this.canvas.height);
                     this.sun = new Sun(this.canvas.width, this.canvas.height);
                     this.sun.sunriseTime = data.sunrise;
                     this.sun.sunsetTime = data.sunset;
                     this.sun.init();
                     this.sun.theTime = data.dt;
 
-                    this._temperature = `${Number.parseFloat(data.temp).toFixed(1)}°C`;
-                    this._humidity = `${data.humidity}%`;
+                    this._temperature = (data.temp) ? `${Number.parseFloat(data.temp).toFixed(1)}°C` : '';
+                    this._humidity = (data.humidity) ? `${data.humidity}%` : '';
                     this.draw();
                     if (this.loading.classList.contains('error')) this.loading.classList.remove('error');
                     this.loading.style.display = 'none';
@@ -102,14 +101,14 @@ class SolarWidget {
         if (this._temperature) {
             return this._temperature;
         }
-        return false;
+        return '';
     }
 
     get humidity() {
         if (this._humidity) {
             return this._humidity;
         }
-        return false;
+        return '';
     }
 
     set refreshDelay(t) {
@@ -135,16 +134,41 @@ class SolarWidget {
         this._clipping = bool;
     }
 
-    getWeather = async function () {
+    // Returns
+    checkLocalStorage = function () {
+        const result = {
+            'isData': false,
+            'isFresh': false,
+            'isUsable': false
+        };
         const savedWeather = localStorage.getItem('currentWeather');
         if (savedWeather) {
-            const savedTime = parseInt(localStorage.getItem('currentTime'));
-            if ((Date.now() - savedTime) < this.fetchInterval) {
-                // Saved data is less than 5 minutes old
-                return this.parseJSON(savedWeather);
-            }else{
-                localStorage.clear();// Clear localStorage
+            if (JSON.parse(savedWeather)) {
+                result.isData = true;
             }
+            const savedTime = parseInt(localStorage.getItem('currentTime'));
+            // Are the data "fresh" enough ?
+            // -> fetched less than this.fetchInterval ago
+            if ((Date.now() - savedTime) < this.fetchInterval) {
+                result.isFresh = true;
+            }
+            // Are the data at least usable ?
+            // -> fetched the same day (sunrise & sunset time are valid)
+            if ((Date.now() - savedTime) < 1000 * 60 * 60 * 24) {
+                result.isUsable = true;
+            } else {
+                // Data is outdated : clear localStorage
+                localStorage.clear();
+            }
+        }
+        return result;
+    }
+
+    getWeather = async function () {
+        const checks = this.checkLocalStorage();
+        if (checks.isData && checks.isFresh) {
+            // Saved data is less than 5 minutes old
+            return JSON.parse(localStorage.getItem('currentWeather'));
         }
 
         if (this.lon && this.lat && this.apiKey) {
@@ -153,20 +177,30 @@ class SolarWidget {
             throw new Error('Wrong parameters to request OpenWeatherMap API !');
         }
 
-        if (!savedWeather && !this.url) {
+        if (!checks.isData && !this.url) {
             throw new Error('Nothing to display !');
         }
 
         let response;
+        let data;
         try {
             response = await fetch(this.url);
         } catch (err) {
-            throw new Error(`Network error! ${err.message}`);
+            if (checks.isData && checks.isUsable) {
+                // Data is outdated but still usable (sunrise & sunset time are ok, but not dt, temp & humidity)
+                data = JSON.parse(localStorage.getItem('currentWeather'));
+                data.dt = Math.round(Date.now()/1000);
+                data.temp = undefined;
+                data.humidity = undefined;
+                return data;
+            }else{
+                throw new Error(`Network error! ${err.message}`);
+            }
         }
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        const data = await response.json(); // data is a JS object
+        data = await response.json(); // data is a JS object
         //  console.log(data.current)
 
         localStorage.setItem('currentWeather', JSON.stringify(data.current));
@@ -296,16 +330,6 @@ class SolarWidget {
             }, delay);
         }
     };
-
-    parseJSON = (data) => {
-        try {
-            const parsed = JSON.parse(data);
-            return parsed;
-        } catch (e) {
-            console.warn('parseJSON', e.message);
-            return undefined;
-        }
-    }
 }
 
 export default SolarWidget;

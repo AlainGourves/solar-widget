@@ -93,6 +93,7 @@ class Starfield {
     drawStars = function () {
         this.stars.forEach(star => {
             let r = Math.random()
+            // Get a random hue in the ranges [1,41] (red-orange) or [190, 280] (blue-purple) depending of the value of r
             let h = (r > 0.5) ? 1 + (Math.random() * 40) : 190 + (Math.random() * 90);
             let c = `hsl(${Math.floor(h)}, 100%, ${Math.floor(80 + Math.random() * 20)}%)`;
             this.ctx.fillStyle = c;
