@@ -35,8 +35,8 @@ class SolarWidget {
         this.fetchInterval = 60 * 5 * 1000; // time in seconds between requests to openWeatherMap API
 
         this.skyColors = new Gradient();
-        this.starfield = new Starfield(this.canvas.width, this.canvas.height);
         this.sun;
+        this.starfield;
 
         this._refreshDelay = null;
         this.timeoutID;
@@ -55,7 +55,7 @@ class SolarWidget {
                     const box = entry.borderBoxSize[0]
                     const newW = parseFloat(box.inlineSize);
                     const newH = parseFloat(box.blockSize);
-                    if (newW > this.canvas.width) {
+                    if (newW !== this.canvas.width) {
                         this.canvas.width = newW;
                         this.canvas.height = newH;
                         this.init()
@@ -75,6 +75,7 @@ class SolarWidget {
                     this.sun.sunsetTime = data.sunset;
                     this.sun.init();
                     this.sun.theTime = data.dt;
+                    this.starfield = new Starfield(this.canvas.width, this.canvas.height); // must be here to generate a new starfield when the canvas' size changes
 
                     this._temperature = (data.temp) ? `${Number.parseFloat(data.temp).toFixed(1)}°C` : '';
                     this._humidity = (data.humidity) ? `${data.humidity}%` : '';
@@ -190,11 +191,11 @@ class SolarWidget {
             if (checks.isData && checks.isUsable) {
                 // Data is outdated but still usable (sunrise & sunset time are ok, but not dt, temp & humidity)
                 data = JSON.parse(localStorage.getItem('currentWeather'));
-                data.dt = Math.round(Date.now()/1000);
+                data.dt = Math.round(Date.now() / 1000);
                 data.temp = undefined;
                 data.humidity = undefined;
                 return data;
-            }else{
+            } else {
                 throw new Error(`Network error! ${err.message}`);
             }
         }
