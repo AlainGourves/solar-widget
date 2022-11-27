@@ -22,10 +22,12 @@ document.querySelector('#app').innerHTML = `
 <div class="solar-parent"></div>
 
 <div class="controls">
-        <label for="cursor">
-            <input type="range" id="cursor" min="0" max="86399">
-            <output></output>
-        </label>
+        <div>
+            <label for="time-slider">
+                <input type="range" id="time-slider" min="0" max="86399">
+                <output></output>
+            </label>
+        </div>
         <div>
             <button>Now</button>
         </div>
@@ -37,7 +39,7 @@ const temp = document.querySelector('.data li:first-of-type span');
 const hum = document.querySelector('.data li:last-of-type span');
 
 
-const cursor = document.querySelector("#cursor");
+const cursor = document.querySelector("#time-slider");
 const label = document.querySelector("output");
 const btnNow = document.querySelector(".controls button");
 
@@ -53,6 +55,7 @@ const update = function (d) {
     widget.time = d;
     const seconds = d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds();
     cursor.value = seconds;
+    document.documentElement.style.setProperty('--time-slider__output', `${seconds / 864}`)
 }
 
 async function main() {
@@ -67,6 +70,7 @@ async function main() {
     d.setHours(0, 0, 0, 0);
     let cursorValue = widget.dt - (d.getTime() / 1000);
     cursor.value = cursorValue;
+    document.documentElement.style.setProperty('--time-slider__output', `${cursorValue / 864}`)
 }
 
 window.addEventListener('load', ev => {
