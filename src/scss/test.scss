@@ -1,9 +1,90 @@
-@import 'inputrange';
+@use 'sass:math';
+// @import 'inputrange';
 
 :root {
     --time-slider__output: ;
 }
 
+// Slider -------------------------
+$track-w: 100%;
+$track-h: .25em;
+$thumb-d: 1em;
+$track-c: #555;
+$progr-c: #f9c50b;
+
+@mixin track() {
+    box-sizing: border-box;
+    border: none;
+    width: $track-w;
+    height: $track-h;
+    background: $track-c;
+    background-image: linear-gradient(90deg, $progr-c, $progr-c);
+    background-size: calc(var(--time-slider__output, 0) * 1%) $track-h; // explicit height: bug in Safari otherwise
+    background-repeat: repeat-y;
+}
+
+@mixin thumb() {
+    box-sizing: border-box;
+    border: none;
+    width: $thumb-d;
+    height: $thumb-d;
+    border-radius: 50%;
+    background: $progr-c;
+    outline: 1px solid $progr-c;
+    outline-offset: calc(var(--out, 0) * .25em);
+    transition: outline-offset .25s linear;
+}
+
+
+[type='range'] {
+    &,
+    &::-webkit-slider-thumb {
+        -webkit-appearance: none
+    }
+
+    flex: 1;
+    margin: 0;
+    padding: 0;
+    min-height: $thumb-d;
+    background: transparent;
+    font: inherit;
+
+    &::-webkit-slider-runnable-track {
+        @include track()
+    }
+
+    &::-moz-range-track {
+        @include track
+    }
+
+    &::-ms-track {
+        @include track
+    }
+
+    &::-webkit-slider-thumb {
+        margin-top: .5*($track-h - $thumb-d);
+        @include thumb
+    }
+
+    &::-moz-range-thumb {
+        @include thumb
+    }
+
+    &::-ms-thumb {
+        margin-top: 0;
+        @include thumb
+    }
+
+    &::-ms-tooltip {
+        display: none
+    }
+
+    &:hover,
+    &:focus-within {
+        --out: 1;
+    }
+}
+// Slider (end) --------------------
 
 .controls {
     width: max-content;
@@ -45,11 +126,11 @@
         width: 100%;
         padding-block: 1.5rem;
         background-image: linear-gradient(to right,
-            transparent calc(#{$thumb-d/2} - 1px),
-            var(--tick-color) calc((#{$thumb-d/2} - 1px) + var(--tick-width)),
+            transparent calc(#{math.div($thumb-d, 2)} - 1px),
+            var(--tick-color) calc((#{math.div($thumb-d, 2)} - 1px) + var(--tick-width)),
             transparent 0,
-            transparent calc(100% - (#{$thumb-d/2} + 1px)),
-            var(--tick-color) calc(100% - (#{$thumb-d/2} + 1px) + var(--tick-width)),
+            transparent calc(100% - (#{math.div($thumb-d, 2)} + 1px)),
+            var(--tick-color) calc(100% - (#{math.div($thumb-d, 2)} + 1px) + var(--tick-width)),
             transparent 0);
         background-size: 100% .5em;
         background-repeat: no-repeat;
@@ -71,13 +152,13 @@
         &::before {
             content: '00:00';
             left: 0;
-            transform: translateX(calc(-50% + #{$thumb-d/2}));
+            transform: translateX(calc(-50% + #{math.div($thumb-d, 2)}));
         }
 
         &::after {
             content: '23:59';
             right: 0;
-            transform: translateX(calc(50% - #{$thumb-d/2}));
+            transform: translateX(calc(50% - #{math.div($thumb-d, 2)}));
         }
 
         &:hover {
@@ -125,5 +206,6 @@
         border: none;
         color: #fff;
         background: #555;
+        cursor: pointer;
     }
 }
