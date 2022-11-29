@@ -26,6 +26,7 @@ document.querySelector('#app').innerHTML = `
             <label for="time-slider">
                 <input type="range" id="time-slider" min="0" max="86399">
                 <output></output>
+                <span></span>
             </label>
         </div>
         <div>
