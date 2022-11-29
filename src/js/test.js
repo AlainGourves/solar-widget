@@ -2,10 +2,6 @@ import '../scss/style.scss'
 import '../scss/test.scss'
 import SolarWidget from "./solar-widget.js";
 
-const widgetWidth = 640 * 1;
-const widgetHeight = 360 * 1;
-document.documentElement.style.setProperty('--sw-canvas-w', `${widgetWidth}px`);
-document.documentElement.style.setProperty('--sw-canvas-h', `${widgetHeight}px`);
 
 const params = {
     lat: 48.1124,
@@ -20,7 +16,6 @@ document.querySelector('#app').innerHTML = `
 <li>Humidité relative: <span></span></li>
 </ul>
 <div class="solar-parent"></div>
-
 <div class="controls">
         <div>
             <label for="time-slider">
@@ -60,9 +55,8 @@ const update = function (d) {
 }
 
 async function main() {
-    // Promises handling cf. https://stackoverflow.com/questions/72544385/handling-of-async-data-in-js-class
     widget = new SolarWidget(parent, params);
-    // widget.clipping = false;
+    widget.clipping = true;
     await widget.init()
     temp.innerHTML = widget.temperature;
     hum.innerHTML = widget.humidity;
@@ -71,7 +65,8 @@ async function main() {
     d.setHours(0, 0, 0, 0);
     let cursorValue = widget.dt - (d.getTime() / 1000);
     cursor.value = cursorValue;
-    document.documentElement.style.setProperty('--time-slider__output', `${cursorValue / 864}`)
+    document.documentElement.style.setProperty('--time-slider__output', `${cursorValue / 864}`);
+    document.querySelector('.controls').style.opacity = 1;
 }
 
 window.addEventListener('load', ev => {

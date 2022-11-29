@@ -5,6 +5,10 @@
     --time-slider__output: ;
 }
 
+.solar-widget__wrap {
+    margin-block-end: 6rem;
+}
+
 // Slider -------------------------\
 $track-w: 100%;
 $track-h: .25em;
@@ -83,17 +87,22 @@ $progr-c: #f9c50b;
 
 .controls {
     --shadow-factor: 0;
-
-    width: max-content;
-    margin: 1rem auto;
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: clamp(300px, 50vw, 100% - 2rem);
+    margin: 1rem auto 0;
     padding: 1rem;
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: space-evenly;
     align-items: center;
     gap: 1rem;
     background-color: #787878;
-    border-radius: 1rem;
+    border-radius: 1rem 1rem 0 0;
+    opacity: 0;
+    transition: opacity .5s linear;
 
     &>div {
         display: flex;

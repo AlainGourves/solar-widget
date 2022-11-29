@@ -6,15 +6,14 @@ class SolarWidget {
     constructor(parent, { lat, lon, apiKey }) {
         this.template = document.createElement('template');
         this.template.innerHTML = `
-<div class="solar-widget__wrap">
-    <div class="solar-widget__loading">Loading...</div>
-    <canvas  class="solar-widget__canvas">Solar Potion Widget</canvas>
-</div>`;
+<div class="solar-widget__loading">Loading...</div>
+<canvas  class="solar-widget__canvas">Solar Potion Widget</canvas>
+`;
 
         this.parent = parent;
         this.parent.classList.add('solar-widget__wrap');
         this.parent.appendChild(this.template.content.cloneNode(true));
-        const parentBounding = this.parent.getBoundingClientRect()
+        const parentBounding = this.parent.getBoundingClientRect();
 
         this.loading = this.parent.querySelector('.solar-widget__loading');
         this.canvas = this.parent.querySelector('canvas.solar-widget__canvas');
@@ -27,8 +26,8 @@ class SolarWidget {
         // cf. https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas#scaling_for_high_resolution_displays
         const dpr = window.devicePixelRatio;
         this.ctx.scale(dpr, dpr);
-        this.canvas.width = parentBounding.width * dpr;
-        this.canvas.height = parentBounding.height * dpr;
+        this.canvas.width = Math.round(parentBounding.width * dpr);
+        this.canvas.height = Math.round(parentBounding.height * dpr);
 
 
         this.url = '';
@@ -47,7 +46,7 @@ class SolarWidget {
         this._clipping = false;
 
         // Resize observer
-        // reinitialize the widget when the new width is bigger
+        // reinitialize the widget when the width changes
         this.observerCallback = (entries) => {
             for (const entry of entries) {
                 if (entry.borderBoxSize) {
@@ -63,6 +62,7 @@ class SolarWidget {
                 }
             }
         }
+        // debounce with a 350ms delay
         this.observer = new ResizeObserver(this.debounce(this.observerCallback, 250));
     }
 
