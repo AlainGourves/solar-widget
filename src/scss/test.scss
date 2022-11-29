@@ -1,5 +1,4 @@
-@use 'sass:math';
-// @import 'inputrange';
+@use 'sass:math'; // for math.div() (division with '/' is deprecated in SCSS)
 
 :root {
     --time-slider__output: ;
@@ -39,7 +38,8 @@ $progr-c: #f9c50b;
 [type='range'] {
     &,
     &::-webkit-slider-thumb {
-        -webkit-appearance: none
+        appearance: none;
+        -webkit-appearance: none;
     }
 
     flex: 1;
