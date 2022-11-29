@@ -5,9 +5,8 @@
 ### HTML
 
 ```html
-<div class="solar-widget__wrap">
-    <div class="solar-widget__loading">Loading...</div>
-    <canvas  class="solar-widget__canvas"width="640" height="360"></canvas>
+<div class="..." id="...">
+    <!-- The widget will be inserted here -->
 </div>
 ```
 
@@ -15,8 +14,8 @@
 
 ```scss
 .solar-widget__wrap{
-    width: 640px;
-    height: 360px;
+    width: var(--sw-canvas-w);
+    height: var(--sw-canvas-h);
     display: grid;
     place-content: center;
 
@@ -39,19 +38,22 @@
 ```js
 import SolarWidget from "./solar-widget.js";
 
+const parent = document.querySelector([parent element selector]);
+let widget;
+
 async function main() {
     const params = {
         lat: 48.1124,
         lon: -1.6798,
         apiKey: OPENWEATHERMAP_API_KEY
     }
-    const widget = new SolarWidget(canvas, params);
+    widget = new SolarWidget(parent, params);
+    widget.clipping = true;
+    widget.refreshDelay = 60000; // redraw every minute
     await widget.init()
-    loading.style.display = 'none'; // or remove from DOM
     temp.innerHTML = widget.temperature;
     hum.innerHTML = widget.humidity;
-    widget.refreshDelay = 60000; // redraw every minute
-    widget.refresh()
+    widget.refresh();
 }
 
 window.addEventListener('load', ev => {
