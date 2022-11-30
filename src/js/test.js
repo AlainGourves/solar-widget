@@ -16,6 +16,7 @@ document.querySelector('#app').innerHTML = `
 <li>Humidité relative: <span></span></li>
 </ul>
 <div class="solar-parent"></div>
+<button id="save">Save Sequence of Images</button>
 <div class="controls">
         <div>
             <label for="time-slider">
@@ -39,6 +40,8 @@ const cursor = document.querySelector("#time-slider");
 const label = document.querySelector("output");
 const btnNow = document.querySelector(".controls button");
 
+const btnSave = document.querySelector('#save');
+
 let widget;
 
 const updateTime = function (d) {
@@ -56,7 +59,7 @@ const update = function (d) {
 
 async function main() {
     widget = new SolarWidget(parent, params);
-    widget.clipping = true;
+    // widget.clipping = true;
     await widget.init()
     temp.innerHTML = widget.temperature;
     hum.innerHTML = widget.humidity;
@@ -74,6 +77,13 @@ window.addEventListener('load', ev => {
 
     btnNow.addEventListener("click", ev => {
         update(new Date());
+    });
+
+    btnSave.addEventListener('click', ev => {
+        const n = 24 * 30; // nombre d'images à produire
+        for (let i = 0; i < n; i++) {
+            widget.doTask(i, n);
+        }
     });
 
     cursor.addEventListener("input", ev => {

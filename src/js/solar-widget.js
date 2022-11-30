@@ -1,3 +1,8 @@
+// Module to save canvas as PNG file on the client
+// (used to create an animation of the sun's path)
+// cf. https://github.com/eligrey/FileSaver.js/
+// and function `doTask()` & `saveCanvas()`below
+import { saveAs } from 'file-saver';
 import Gradient from "./gradient.js";
 import Starfield from "./starfield.js";
 import Sun from "./sun.js";
@@ -319,6 +324,24 @@ class SolarWidget {
         document.body.appendChild(anc)
         anc.click()
         anc.remove()
+    }
+
+    saveCanvas = function (i, nb) {
+        const d = new Date();
+        const interval = (3600 * 24) / nb;
+        const t = i * interval;
+        d.setHours(0, 0, t, 0);
+        this.time = d; // set the time to draw the corresponding image
+        this.canvas.toBlob(blob => {
+            saveAs(blob, `img-${(i + 1).toString().padStart(4, '0')}.png`);
+        });
+    }
+
+    doTask = function (i, nb) {
+        // the purpose of this function is to create a delay between each call to saveCanvas(), without it the browser stop saving pictures way before the end of the loop
+        setTimeout(() => {
+            this.saveCanvas(i, nb);
+        }, i * 200);
     }
 
     debounce = (func, delay) => {
