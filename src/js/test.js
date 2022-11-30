@@ -27,7 +27,7 @@ document.querySelector('#app').innerHTML = `
         <div>
             <button>Now</button>
         </div>
-    </div>
+</div>
 `;
 
 const parent = document.querySelector('.solar-parent');
@@ -66,7 +66,7 @@ async function main() {
     let cursorValue = widget.dt - (d.getTime() / 1000);
     cursor.value = cursorValue;
     document.documentElement.style.setProperty('--time-slider__output', `${cursorValue / 864}`);
-    document.querySelector('.controls').style.opacity = 1;
+    document.querySelector('.controls').style.opacity = 1; // shows up only when ready
 }
 
 window.addEventListener('load', ev => {
