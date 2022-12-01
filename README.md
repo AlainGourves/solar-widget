@@ -5,55 +5,33 @@
 ### HTML
 
 ```html
-<div class="..." id="...">
-    <!-- The widget will be inserted here -->
-</div>
+<div class="solar-parent"></div>
 ```
 
 ### CSS/SCSS
 
-```scss
-.solar-widget__wrap{
-    width: var(--sw-canvas-w);
-    height: var(--sw-canvas-h);
-    display: grid;
-    place-content: center;
-
-    &>*{
-        grid-area: 1/1;
-    }
-}
-
-.solar-widget__loading{
-    z-index: 1;
-    display: grid;
-    place-content: center;
-    font-size: 2rem;
-    color: rebeccapurple;
-}
-```
+// feuille de style à intégrer
 
 ### Javascript
 
 ```js
 import SolarWidget from "./solar-widget.js";
 
-const parent = document.querySelector([parent element selector]);
+const params = {
+    lat: 48.1124,
+    lon: -1.6798,
+    apiKey: import.meta.env.VITE_API_KEY
+}
+
 let widget;
 
 async function main() {
-    const params = {
-        lat: 48.1124,
-        lon: -1.6798,
-        apiKey: OPENWEATHERMAP_API_KEY
-    }
     widget = new SolarWidget(parent, params);
-    widget.clipping = true;
+    widget.clipping = true; // widget is clipped in a "squircle"
     widget.refreshDelay = 60000; // redraw every minute
     await widget.init()
-    temp.innerHTML = widget.temperature;
+    temp.innerHTML = widget.temperature; // tempeature & relative humidity infos are accessible
     hum.innerHTML = widget.humidity;
-    widget.refresh();
 }
 
 window.addEventListener('load', ev => {
