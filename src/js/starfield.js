@@ -16,12 +16,6 @@ class Starfield {
         this.canvas.width = this.canvasWidth;
         this.canvas.height = this.canvasHeight;
 
-        // à virer après
-        this.sfCanvas = document.createElement('canvas');
-        this.sfCtx = this.sfCanvas.getContext('2d');
-        this.sfCanvas.width = this.resultWidth;
-        this.sfCanvas.height = this.resultHeight;
-
         // Stars
         this.nbStars = Math.floor((this.canvasWidth * this.canvasWidth) /200); // # of stars is linked to the dimensions of the canvas
         // Generate the stars
@@ -71,16 +65,7 @@ class Starfield {
         tmpCtx.clearRect(0, 0, this.resultWidth, this.resultHeight);
         tmpCtx.putImageData(imageData, 0, 0);
 
-        // à virer après
-        this.sfCtx.clearRect(0, 0, this.resultWidth, this.resultHeight);
-        this.sfCtx.putImageData(imageData, 0, 0);
-
         return tmpCanvas;
-    }
-
-    // à virer après
-    downloadImage = function () {
-        return this.sfCanvas.toDataURL()
     }
 
     addStar = function () {

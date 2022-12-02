@@ -9,19 +9,11 @@ document.querySelector('#app').innerHTML = `
 </ul>
 
 <div class="solar-parent"></div>
-
-<button id="bob">Download PNG</button>
-<button id="sun">Download Sun</button>
-<button id="sun-path">Download Sun Path</button>
 `;
 
 const parent = document.querySelector('.solar-parent');
 const temp = document.querySelector('.data li:first-of-type span');
 const hum = document.querySelector('.data li:last-of-type span');
-
-const btn = document.querySelector('button#bob');
-const btnSun = document.querySelector('button#sun');
-const btnSunPath = document.querySelector('button#sun-path');
 
 // For the widget :
 const params = {
@@ -45,14 +37,4 @@ async function main() {
 window.addEventListener('load', ev => {
     main();
     window.widget = widget; // makes it accessible
-
-    btn.addEventListener('click', ev => {
-        widget.downloadStarfield()
-    })
-    btnSun.addEventListener('click', ev => {
-        widget.downloadSun()
-    })
-    btnSunPath.addEventListener('click', ev => {
-        widget.downloadSunPath()
-    })
 });

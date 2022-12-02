@@ -26,6 +26,9 @@ body {
 .solar-widget__wrap {
     width: max(20rem, 100vw - 2rem);
     aspect-ratio: 16 / 9;
+    @media screen and (max-width: 30rem) {
+        aspect-ratio: 4/3;
+    }
     display: grid;
     place-content: center;
 

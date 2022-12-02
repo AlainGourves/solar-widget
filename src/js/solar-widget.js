@@ -291,36 +291,6 @@ class SolarWidget {
         return path;
     };
 
-    downloadStarfield = function () {
-        let res = this.starfield.downloadImage()
-        let anc = document.createElement('a')
-        anc.download = 'download'
-        anc.href = res;
-        document.body.appendChild(anc)
-        anc.click()
-        anc.remove()
-    }
-
-    downloadSun = function () {
-        let res = this.sun.downloadImage()
-        let anc = document.createElement('a')
-        anc.download = 'download'
-        anc.href = res;
-        document.body.appendChild(anc)
-        anc.click()
-        anc.remove()
-    }
-
-    downloadSunPath = function () {
-        let res = this.sun.downloadPathImage()
-        let anc = document.createElement('a')
-        anc.download = 'download'
-        anc.href = res;
-        document.body.appendChild(anc)
-        anc.click()
-        anc.remove()
-    }
-
     debounce = (func, delay) => {
         let timer;
         return function () {     //anonymous function

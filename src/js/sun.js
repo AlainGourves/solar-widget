@@ -290,14 +290,6 @@ class Sun {
             .toString()
             .padStart(2, "0")}`;
     }
-
-    // à virer après
-    downloadImage = function () {
-        return this.canvasSun.toDataURL()
-    }
-    downloadPathImage = function () {
-        return this.canvasPath.toDataURL()
-    }
 }
 
 export default Sun;
