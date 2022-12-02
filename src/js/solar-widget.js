@@ -1,3 +1,5 @@
+import '../scss/solar-widget.scss';
+
 import Gradient from "./gradient.js";
 import Starfield from "./starfield.js";
 import Sun from "./sun.js";
@@ -7,7 +9,7 @@ class SolarWidget {
         this.template = document.createElement('template');
         this.template.innerHTML = `
 <div class="solar-widget__loading">Loading...</div>
-<canvas  class="solar-widget__canvas">Solar Potion Widget</canvas>
+<canvas  class="solar-widget__canvas">Solar Position Widget</canvas>
 `;
 
         this.parent = parent;
@@ -136,7 +138,7 @@ class SolarWidget {
         this._clipping = bool;
     }
 
-    // Returns
+    // check the presence & validity of stored data
     checkLocalStorage = function () {
         const result = {
             'isData': false,

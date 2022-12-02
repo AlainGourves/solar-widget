@@ -1,8 +1,8 @@
-// vite.config.js
+// for Vite Config Intellisense
+// cf. https://vitejs.dev/config/#config-intellisense
 /** @type {import('vite').UserConfig} */
 
 export default {
-    // config options
     root: './src',
     envDir: '../',
 
@@ -15,20 +15,17 @@ export default {
         port: 3030
     },
 
-    plugins: [
-        // legacy({
-        //     targets: ['defaults', 'not IE 11']
-        // }),
-    ],
-
-    // empêche esbuild de minifier les noms des fonctions,
-    esbuild: {
-        keepNames: true
-    },
-
     build: {
         emptyOutDir: true,
         outDir: '../dist',
-        sourcemap: true,
+        // sourcemap: true,
+        cssCodeSplit: true,
+        lib: {
+            entry: './js/solar-widget.js',
+            name: 'SolarWidget',
+            // the proper extensions will be added
+            fileName: 'solar-widget',
+            formats: ['es']
+        }
     }
 }
