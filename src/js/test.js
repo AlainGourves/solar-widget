@@ -1,5 +1,6 @@
-import '../scss/style.scss'
-import '../scss/test.scss'
+import '../scss/style.scss';
+import '../scss/test.scss';
+
 import SolarWidget from "./solar-widget.js";
 
 
