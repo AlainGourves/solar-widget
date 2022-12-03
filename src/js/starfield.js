@@ -1,11 +1,11 @@
 class Starfield {
 
     constructor(w, h) {
-        // canvas is a square of side sqrt(2)*w to allow the rotation of a w*h rectangle
+        // canvas is a square bif enough to allow the rotation of a w*h rectangle around its center
         // this.canvas's purpose is to create the base image, generated once (here),
-        // which is used later to produce the returned images (allowings the starry sky to "rotate")
+        // which is used later to produce the returned images (allowing the starry sky to "rotate")
 
-        this.canvasWidth = Math.ceil(Math.sqrt(2) * w);
+        this.canvasWidth = Math.ceil(Math.sqrt(w*w + h*h));
         this.canvasHeight = this.canvasWidth;
         // dimensions of the returned image
         this.resultWidth = w;
@@ -25,8 +25,9 @@ class Starfield {
         }
         this.stars = tmpStars.filter(star => star.r > 0.3); // filters out the smallest stars
 
-        this._angle = 0; // angle of rotation of the sky
-        this.angleStep = (Math.PI * 2) / (3600 * 24);
+        this.TWOPI = Math.PI * 2;
+        this._angle = 0; // angle of rotation of the sky around the canvas' center
+        this.angleStep = this.TWOPI / (3600 * 24);
 
         this.drawStars();
         this.stars = []; // not needed anymore
@@ -40,7 +41,7 @@ class Starfield {
 
     // returns the used image
     get image() {
-        // Temporary canvas
+        // Temporary canvas for the rotation
         const tmpCanvas = document.createElement('canvas');
         const tmpCtx = tmpCanvas.getContext('2d');
         tmpCanvas.width = this.canvasWidth;
@@ -60,6 +61,7 @@ class Starfield {
 
         const imageData = tmpCtx.getImageData((this.canvasWidth - this.resultWidth) / 2, ((this.canvasHeight - this.resultHeight) / 2), this.resultWidth, this.resultHeight);
 
+        // Canvas to final dimensions
         tmpCanvas.width = this.resultWidth;
         tmpCanvas.height = this.resultHeight;
         tmpCtx.clearRect(0, 0, this.resultWidth, this.resultHeight);
@@ -78,22 +80,22 @@ class Starfield {
     drawStars = function () {
         this.stars.forEach(star => {
             let r = Math.random()
-            // Get a random hue in the ranges [1,41] (red-orange) or [190, 280] (blue-purple) depending of the value of r
-            let h = (r > 0.5) ? 1 + (Math.random() * 40) : 190 + (Math.random() * 90);
+            // Get a random hue in the ranges [10,50] (red-orange) or [200, 280] (blue-purple) depending of the value of r
+            let h = (r > 0.5) ? 10 + (Math.random() * 40) : 200 + (Math.random() * 80);
             let c = `hsl(${Math.floor(h)}, 100%, ${Math.floor(80 + Math.random() * 20)}%)`;
             this.ctx.fillStyle = c;
             this.ctx.beginPath();
             this.ctx.globalAlpha = 0.25 + Math.random()/2;
-            this.ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+            this.ctx.arc(star.x, star.y, star.r, 0, this.TWOPI);
             this.ctx.fill();
         });
         // Pole Star (at the center)
         this.ctx.fillStyle = '#fff';
-        this.ctx.shadowColor = '#fff';
+        this.ctx.shadowColor = this.ctx.fillStyle;
         this.ctx.shadowBlur = 4;
         this.ctx.globalAlpha = 0.95;
         this.ctx.beginPath();
-        this.ctx.arc(this.canvasWidth / 2, this.canvasHeight / 2, 1.5, 0, Math.PI * 2);
+        this.ctx.arc(this.canvasWidth / 2, this.canvasHeight / 2, 1.5, 0, this.TWOPI);
         this.ctx.fill();
         this.ctx.shadowBlur = 0;
         // Blur effect
