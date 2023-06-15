@@ -155,8 +155,8 @@ class Sun {
         // Clipping mask (to have "flat" line caps)
         this.ctxPath.save()
         this.ctxPath.beginPath();
-        let diviser = (pos === 'up') ? -2 : 2;
-        this.ctxPath.rect(0, 0, this.canvasWidth, this.canvasHeight / diviser);
+        let factor = (pos === 'up') ? -1 : 1;
+        this.ctxPath.rect(0, 0, this.canvasWidth, this.canvasHeight * factor);
         this.ctxPath.clip();
         this.ctxPath.beginPath();
         this.ctxPath.strokeStyle = sty;
@@ -216,7 +216,7 @@ class Sun {
             // Create a clipping path
             this.ctxSun.save();
             this.ctxSun.beginPath();
-            this.ctxSun.rect(0, 0, this.canvasWidth, this.canvasHeight / -2);
+            this.ctxSun.rect(0, 0, this.canvasWidth, -this.canvasHeight);
             this.ctxSun.clip();
             this.ctxSun.fillStyle = this.styleSunVisible;
             this.ctxSun.shadowColor = this.styleSunVisible;
@@ -259,9 +259,20 @@ class Sun {
         this.ctxPath.save();
         this.ctxPath.font = this.textFont;
         const metrics = this.ctxPath.measureText(t);
-        const factor = (x < this.canvasWidth / 2) ? -1 : 1;
         const m = this.sunRadius / 2; // margin
-        x = x + (m + this.sunRadius) * factor;
+        const dx = (m + this.sunRadius);
+        let factor=0;
+        // normally, sunrise time is placed on the left of the curve, and sunset time on the right
+        // unless the text overflows the canvas
+        // -> role of the `factor`variable
+        if (x < this.canvasWidth / 2) {
+            // sunrise time
+            factor = ((x - dx - metrics.width) > 0) ? -1 : 1;
+        }else{
+            //sunset time
+            factor = ((x + dx + metrics.width) < this.canvasWidth) ? 1 : -1;
+        }
+        x = x + dx * factor;
         if (factor < 0) x -= metrics.width;
         y = y - 2 * m;
         // rounded rect
