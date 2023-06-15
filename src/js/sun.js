@@ -43,7 +43,7 @@ class Sun {
 
 
         // Customization
-        const dpr = window.devicePixelRatio; // 1 for "normal", 2 for "retina"
+        const dpr = 1; //window.devicePixelRatio; // 1 for "normal", 2 for "retina"
         this.sunPathStokeWidth = 4;
         this.sunRadius = 16;// * dpr;
         this.sunBlur = 6 * dpr;
